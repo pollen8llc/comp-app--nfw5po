@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package analytics.v1;
+
+option go_package = "./analytics";
+
+import "google/protobuf/timestamp.proto";
+
+// Supported distance metrics for TDA computation
+enum DistanceMetric {
+  EUCLIDEAN = 0;  // Standard Euclidean distance
+  MANHATTAN = 1;  // L1/Manhattan distance
+  COSINE = 2;     // Cosine similarity distance
+}
+
+// Request message for TDA computation with configurable parameters
+message TDARequest {
+  double epsilon = 1;                // Neighborhood size (range: 0.1-1.0)
+  int32 min_points = 2;             // Minimum points for cluster (range: 5-50)
+  int32 dimension = 3;              // Visualization dimensionality (2 or 3)
+  double persistence_threshold = 4;  // Feature significance threshold (range: 0.1-0.9)
+  DistanceMetric distance_metric = 5; // Distance metric to use
+}
+
+// Persistence diagram point representing birth/death of topological feature
+message PersistencePoint {
+  double birth = 1;
+  double death = 2;
+  int32 dimension = 3;
+}
+
+// Complete persistence diagram from TDA computation
+message PersistenceDiagram {
+  repeated PersistencePoint points = 1;
+  string feature_type = 2;  // Type of topological feature (e.g., connected components, cycles)
+}
+
+// Individual topological feature identified during analysis
+message TopologicalFeature {
+  string feature_id = 1;
+  string feature_type = 2;
+  double persistence = 3;
+  repeated string member_ids = 4;  // IDs of members involved in this feature
+  map<string, double> properties = 5;  // Additional feature properties
+}
+
+// Response message containing TDA computation results
+message TDAResponse {
+  PersistenceDiagram persistence_diagram = 1;
+  repeated TopologicalFeature topological_features = 2;
+  google.protobuf.Timestamp computation_time = 3;
+  map<string, double> computation_metrics = 4;  // Performance metrics
+}
+
+// Request message for network analysis
+message NetworkAnalysisRequest {
+  repeated string metrics = 1;  // List of requested network metrics
+  google.protobuf.Timestamp start_date = 2;
+  google.protobuf.Timestamp end_date = 3;
+  map<string, string> analysis_params = 4;  // Additional analysis parameters
+}
+
+// Response message containing network analysis results
+message NetworkAnalysisResponse {
+  map<string, double> centrality_scores = 1;
+  map<string, double> community_metrics = 2;
+  google.protobuf.Timestamp computation_time = 3;
+  repeated string communities = 4;  // Identified community structures
+  map<string, double> global_metrics = 5;  // Network-wide metrics
+}
+
+// Request message for graph queries
+message GraphQueryRequest {
+  string query = 1;  // Graph query string
+  map<string, string> parameters = 2;  // Query parameters
+  bool include_topology = 3;  // Whether to include topological features
+  int32 max_results = 4;  // Maximum number of results to return
+}
+
+// Response message for graph queries
+message GraphQueryResponse {
+  repeated bytes results = 1;  // Query results as serialized objects
+  repeated TopologicalFeature topological_features = 2;  // Related topological features
+  google.protobuf.Timestamp execution_time = 3;
+  map<string, double> query_metrics = 4;  // Query performance metrics
+}
+
+// Analytics service definition
+service AnalyticsService {
+  // Compute Topological Data Analysis features
+  rpc ComputeTDA(TDARequest) returns (TDAResponse) {}
+  
+  // Perform comprehensive network analysis
+  rpc AnalyzeNetwork(NetworkAnalysisRequest) returns (NetworkAnalysisResponse) {}
+  
+  // Execute optimized graph queries with integrated TDA features
+  rpc QueryGraph(GraphQueryRequest) returns (GraphQueryResponse) {}
+}
