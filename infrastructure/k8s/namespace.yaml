@@ -1,0 +1,22 @@
+# Kubernetes v1.24+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: community-platform
+  labels:
+    name: community-platform
+    environment: production
+    app: community-platform
+    managed-by: terraform
+    security-tier: restricted
+    network-policy: enabled
+    monitoring: enabled
+  annotations:
+    description: "Community Management Platform production environment"
+    security.kubernetes.io/enforce-pod-security: restricted
+    network-policy.kubernetes.io/isolated: "true"
+    monitoring.kubernetes.io/scrape: "true"
+    backup.kubernetes.io/enabled: "true"
+    terraform.io/managed: "true"
+    owner: platform-team
+    support-contact: platform-support@company.com
