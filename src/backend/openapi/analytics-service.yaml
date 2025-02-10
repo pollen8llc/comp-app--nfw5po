@@ -1,0 +1,255 @@
+// analytics.service.ts
+// Dependencies versions:
+// @types/node: ^18.0.0
+// express: ^4.18.2
+// express-validator: ^7.0.1
+// @neo4j/graphql: ^4.0.0
+// networkx: ^0.9.3
+// @types/express: ^4.17.17
+// winston: ^3.10.0
+
+import express, { Request, Response, NextFunction } from 'express';
+import { body, validationResult, header } from 'express-validator';
+import { Neo4jGraphQL } from '@neo4j/graphql';
+import * as networkx from 'networkx';
+import winston from 'winston';
+
+// Configure logging
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'combined.log' })
+  ]
+});
+
+// Interface definitions based on OpenAPI schema
+interface TDAParameters {
+  epsilon: number;
+  minPoints: number;
+  dimension: 2 | 3;
+  persistence?: number;
+  distanceMetric?: 'euclidean' | 'manhattan' | 'cosine';
+}
+
+interface NetworkAnalysisConfig {
+  metrics: Array<'centrality' | 'clustering' | 'density'>;
+  dateRange: {
+    start: string;
+    end: string;
+  };
+}
+
+interface GraphQuery {
+  query: string;
+  parameters?: Record<string, any>;
+  timeout?: number;
+}
+
+// Rate limiting configuration
+const RATE_LIMIT = {
+  TDA_COMPUTE: 100,
+  NETWORK_ANALYZE: 200,
+  GRAPH_QUERY: 500
+};
+
+// Error handling middleware
+const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
+  logger.error('Error:', { error: err.message, stack: err.stack });
+  res.status(500).json({
+    error: 'Internal server error',
+    details: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
+};
+
+// Validation middleware
+const validateTDAParameters = [
+  body('epsilon').isFloat({ min: 0.1, max: 1.0 }),
+  body('minPoints').isInt({ min: 5, max: 50 }),
+  body('dimension').isIn([2, 3]),
+  body('persistence').optional().isFloat({ min: 0.1, max: 0.9 }),
+  body('distanceMetric').optional().isIn(['euclidean', 'manhattan', 'cosine']),
+  header('X-Request-Timeout').optional().isInt({ min: 100, max: 5000 })
+];
+
+const validateNetworkAnalysisConfig = [
+  body('metrics').isArray().notEmpty(),
+  body('metrics.*').isIn(['centrality', 'clustering', 'density']),
+  body('dateRange.start').isISO8601(),
+  body('dateRange.end').isISO8601(),
+  header('X-Request-Timeout').optional().isInt({ min: 100, max: 5000 })
+];
+
+const validateGraphQuery = [
+  body('query').isString().isLength({ max: 1000 }),
+  body('parameters').optional().isObject(),
+  body('timeout').optional().isInt({ min: 100, max: 2000 }),
+  header('X-Request-Timeout').optional().isInt({ min: 100, max: 5000 })
+];
+
+class AnalyticsService {
+  private neo4jGraphQL: Neo4jGraphQL;
+
+  constructor(neo4jGraphQL: Neo4jGraphQL) {
+    this.neo4jGraphQL = neo4jGraphQL;
+  }
+
+  async computeTDA(req: Request, res: Response) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const params: TDAParameters = req.body;
+      const timeout = req.header('X-Request-Timeout') || 2000;
+
+      // Perform TDA computation
+      const result = await this.performTDAComputation(params, timeout);
+
+      res.setHeader('X-RateLimit-Limit', RATE_LIMIT.TDA_COMPUTE);
+      res.setHeader('X-RateLimit-Remaining', RATE_LIMIT.TDA_COMPUTE - 1);
+      res.setHeader('Cache-Control', 'private, max-age=600');
+
+      return res.status(200).json(result);
+    } catch (error) {
+      logger.error('TDA computation error:', error);
+      return res.status(500).json({ error: 'TDA computation failed' });
+    }
+  }
+
+  async analyzeNetwork(req: Request, res: Response) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const config: NetworkAnalysisConfig = req.body;
+      const timeout = req.header('X-Request-Timeout') || 2000;
+
+      // Perform network analysis
+      const result = await this.performNetworkAnalysis(config, timeout);
+
+      res.setHeader('X-RateLimit-Limit', RATE_LIMIT.NETWORK_ANALYZE);
+      res.setHeader('X-RateLimit-Remaining', RATE_LIMIT.NETWORK_ANALYZE - 1);
+
+      return res.status(200).json(result);
+    } catch (error) {
+      logger.error('Network analysis error:', error);
+      return res.status(500).json({ error: 'Network analysis failed' });
+    }
+  }
+
+  async queryGraph(req: Request, res: Response) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const { query, parameters, timeout = 1000 }: GraphQuery = req.body;
+      const requestTimeout = req.header('X-Request-Timeout') || 2000;
+
+      // Execute graph query
+      const result = await this.executeGraphQuery(query, parameters, timeout);
+
+      res.setHeader('X-RateLimit-Limit', RATE_LIMIT.GRAPH_QUERY);
+      res.setHeader('X-RateLimit-Remaining', RATE_LIMIT.GRAPH_QUERY - 1);
+
+      return res.status(200).json(result);
+    } catch (error) {
+      logger.error('Graph query error:', error);
+      return res.status(500).json({ error: 'Graph query failed' });
+    }
+  }
+
+  private async performTDAComputation(params: TDAParameters, timeout: number): Promise<any> {
+    // Implementation of TDA computation using networkx
+    const { epsilon, minPoints, dimension, persistence = 0.3, distanceMetric = 'euclidean' } = params;
+    
+    // Create a promise that rejects after timeout
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('TDA computation timeout')), timeout);
+    });
+
+    const computationPromise = new Promise(async (resolve) => {
+      // Fetch graph data from Neo4j
+      const graphData = await this.neo4jGraphQL.execute(`
+        MATCH (n)-[r]-(m)
+        RETURN n, r, m
+      `);
+
+      // Convert to networkx format and compute TDA
+      const network = networkx.fromGraphData(graphData);
+      const tdaFeatures = networkx.computePersistentHomology(network, {
+        epsilon,
+        minPoints,
+        dimension,
+        persistence,
+        metric: distanceMetric
+      });
+
+      resolve(tdaFeatures);
+    });
+
+    return Promise.race([computationPromise, timeoutPromise]);
+  }
+
+  private async performNetworkAnalysis(config: NetworkAnalysisConfig, timeout: number): Promise<any> {
+    const { metrics, dateRange } = config;
+
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Network analysis timeout')), timeout);
+    });
+
+    const analysisPromise = new Promise(async (resolve) => {
+      const results: Record<string, any> = {};
+
+      // Fetch graph data within date range
+      const graphData = await this.neo4jGraphQL.execute(`
+        MATCH (n)-[r]-(m)
+        WHERE r.timestamp >= $start AND r.timestamp <= $end
+        RETURN n, r, m
+      `, { start: dateRange.start, end: dateRange.end });
+
+      const network = networkx.fromGraphData(graphData);
+
+      // Compute requested metrics
+      for (const metric of metrics) {
+        switch (metric) {
+          case 'centrality':
+            results.centrality = networkx.betweennessCentrality(network);
+            break;
+          case 'clustering':
+            results.clustering = networkx.averageClusteringCoefficient(network);
+            break;
+          case 'density':
+            results.density = networkx.density(network);
+            break;
+        }
+      }
+
+      resolve(results);
+    });
+
+    return Promise.race([analysisPromise, timeoutPromise]);
+  }
+
+  private async executeGraphQuery(
+    query: string,
+    parameters?: Record<string, any>,
+    timeout?: number
+  ): Promise<any> {
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Graph query timeout')), timeout);
+    });
+
+    const queryPromise = this.neo4jGraphQL.execute(query, parameters);
+    return Promise.race([queryPromise, timeoutPromise]);
+  }
+}
+
+// Export the service
+export default AnalyticsService;
