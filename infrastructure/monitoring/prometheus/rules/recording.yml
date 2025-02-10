@@ -1,0 +1,100 @@
+# Prometheus Recording Rules Configuration v2.45.0
+# Defines pre-computed metrics and aggregations for the Community Management Platform
+
+groups:
+  # API Performance and Reliability Metrics
+  - name: api_metrics
+    rules:
+      - record: cmp:api_error_rate:5m
+        expr: sum(rate(http_requests_total{status=~"5.."}[5m])) by (service) / sum(rate(http_requests_total[5m])) by (service)
+        labels:
+          team: platform
+          slo_target: "0.001"
+      
+      - record: cmp:api_latency:5m
+        expr: rate(http_request_duration_seconds_sum[5m]) / rate(http_request_duration_seconds_count[5m])
+        labels:
+          team: platform
+          slo_target: "0.2"
+      
+      - record: cmp:api_throughput:5m
+        expr: sum(rate(http_requests_total[5m])) by (service, endpoint)
+        labels:
+          team: platform
+
+  # Graph Database Performance Metrics
+  - name: graph_metrics
+    rules:
+      - record: cmp:graph_query_latency:5m
+        expr: rate(neo4j_query_duration_seconds_sum[5m]) / rate(neo4j_query_duration_seconds_count[5m])
+        labels:
+          team: data
+          slo_target: "1.0"
+      
+      - record: cmp:graph_query_rate:5m
+        expr: sum(rate(neo4j_queries_total[5m])) by (query_type)
+        labels:
+          team: data
+      
+      - record: cmp:graph_error_rate:5m
+        expr: sum(rate(neo4j_query_errors_total[5m])) by (query_type) / sum(rate(neo4j_queries_total[5m])) by (query_type)
+        labels:
+          team: data
+          slo_target: "0.001"
+
+  # Resource Utilization Metrics
+  - name: resource_metrics
+    rules:
+      - record: cmp:memory_usage:5m
+        expr: 100 * (container_memory_usage_bytes / container_spec_memory_limit_bytes)
+        labels:
+          team: platform
+          threshold: "80"
+      
+      - record: cmp:cpu_usage:5m
+        expr: 100 * sum(rate(container_cpu_usage_seconds_total[5m])) by (container_name)
+        labels:
+          team: platform
+          threshold: "70"
+
+  # Security and Access Metrics
+  - name: security_metrics
+    rules:
+      - record: cmp:auth_failure_rate:5m
+        expr: sum(rate(auth_failures_total[5m])) by (service)
+        labels:
+          team: security
+          threshold: "10"
+      
+      - record: cmp:rate_limit_exceeded:5m
+        expr: sum(rate(rate_limit_exceeded_total[5m])) by (endpoint)
+        labels:
+          team: security
+          threshold: "100"
+      
+      - record: cmp:suspicious_access_patterns:5m
+        expr: sum(rate(suspicious_access_total[5m])) by (pattern_type)
+        labels:
+          team: security
+          severity: high
+
+  # Analytics and Data Processing Metrics
+  - name: analytics_metrics
+    rules:
+      - record: cmp:tda_computation_duration:5m
+        expr: rate(tda_computation_duration_seconds_sum[5m]) / rate(tda_computation_duration_seconds_count[5m])
+        labels:
+          team: data
+          slo_target: "5.0"
+      
+      - record: cmp:entity_resolution_accuracy:5m
+        expr: sum(rate(entity_resolution_success_total[5m])) / sum(rate(entity_resolution_total[5m]))
+        labels:
+          team: data
+          slo_target: "0.95"
+      
+      - record: cmp:analytics_job_success_rate:5m
+        expr: sum(rate(analytics_jobs_success_total[5m])) / sum(rate(analytics_jobs_total[5m]))
+        labels:
+          team: data
+          slo_target: "0.99"
