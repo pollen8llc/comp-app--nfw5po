@@ -1,0 +1,122 @@
+syntax = "proto3";
+
+package event.v1;
+
+import "google/protobuf/timestamp.proto"; // v3 - Standard timestamp type
+
+option go_package = "./event";
+
+// Enumeration of supported event platforms for integration
+enum EventPlatform {
+  EVENT_PLATFORM_UNSPECIFIED = 0;
+  LUMA = 1;
+  EVENTBRITE = 2;
+  PARTIFUL = 3;
+}
+
+// Comprehensive event metadata structure
+message EventMetadata {
+  map<string, string> tags = 1;
+  repeated string categories = 2;
+  int32 capacity = 3;
+  bool is_private = 4;
+  map<string, string> venue_details = 5;
+  map<string, string> organizer_info = 6;
+}
+
+// Core event message definition
+message Event {
+  string id = 1;
+  string title = 2;
+  optional string description = 3;
+  google.protobuf.Timestamp start_date = 4;
+  google.protobuf.Timestamp end_date = 5;
+  string location = 6;
+  EventPlatform platform = 7;
+  optional string external_id = 8;
+  EventMetadata metadata = 9;
+  string status = 10;
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp updated_at = 12;
+}
+
+// Request message for creating new events
+message CreateEventRequest {
+  string title = 1;
+  optional string description = 2;
+  google.protobuf.Timestamp start_date = 3;
+  google.protobuf.Timestamp end_date = 4;
+  string location = 5;
+  EventMetadata metadata = 6;
+}
+
+// Request message for importing events from external platforms
+message ImportEventsRequest {
+  EventPlatform platform = 1;
+  string api_key = 2;
+  google.protobuf.Timestamp start_date = 3;
+  google.protobuf.Timestamp end_date = 4;
+  int32 batch_size = 5;
+  map<string, string> filters = 6;
+}
+
+// Response message for event import operations
+message ImportEventsResponse {
+  int32 total_events = 1;
+  int32 imported_events = 2;
+  repeated string failed_events = 3;
+  google.protobuf.Timestamp import_time = 4;
+  map<string, string> error_details = 5;
+  repeated string warnings = 6;
+}
+
+// Request message for updating events
+message UpdateEventRequest {
+  string event_id = 1;
+  Event event = 2;
+}
+
+// Request message for deleting events
+message DeleteEventRequest {
+  string event_id = 1;
+}
+
+// Request message for retrieving a single event
+message GetEventRequest {
+  string event_id = 1;
+}
+
+// Request message for listing events
+message ListEventsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  map<string, string> filters = 3;
+}
+
+// Response message for listing events
+message ListEventsResponse {
+  repeated Event events = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+// Comprehensive gRPC service for event management
+service EventService {
+  // Creates a new event
+  rpc CreateEvent(CreateEventRequest) returns (Event) {}
+  
+  // Imports events from external platforms
+  rpc ImportEvents(ImportEventsRequest) returns (ImportEventsResponse) {}
+  
+  // Updates an existing event
+  rpc UpdateEvent(UpdateEventRequest) returns (Event) {}
+  
+  // Deletes an event
+  rpc DeleteEvent(DeleteEventRequest) returns (Event) {}
+  
+  // Retrieves a single event by ID
+  rpc GetEvent(GetEventRequest) returns (Event) {}
+  
+  // Lists events with pagination and filtering
+  rpc ListEvents(ListEventsRequest) returns (ListEventsResponse) {}
+}
