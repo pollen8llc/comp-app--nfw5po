@@ -1,0 +1,36 @@
+[Binary content - ICO file with the following specifications]
+
+File Format: ICO (Windows Icon)
+Contains: 2 images
+- 16x16 pixels (for browser tabs and bookmarks)
+- 32x32 pixels (for PWA and higher resolution displays)
+
+Image Properties:
+- Color Depth: 32-bit with alpha channel
+- Format: PNG compressed (within ICO container)
+- Primary Color: #ffffff
+- Background: #ffffff (transparent enabled)
+
+Metadata:
+Content-Type: image/x-icon
+Cache-Control: public, max-age=31536000, immutable
+
+Browser Support:
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
+
+PWA Metadata:
+purpose: any maskable
+display: standalone
+sizes: 16x16 32x32
+
+Design Notes:
+- Follows Material Design 3.0 principles
+- High contrast support enabled
+- Dark mode compatible
+- Optimized for high DPI displays
+- Maintains clarity at small sizes
+- Simple, recognizable shape
+- Consistent with brand identity
