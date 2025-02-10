@@ -1,0 +1,143 @@
+# Prometheus configuration file v2.45.0
+# Global configuration
+global:
+  scrape_interval: 15s
+  evaluation_interval: 1m
+  scrape_timeout: 10s
+
+# Scrape configurations for all services
+scrape_configs:
+  # API Gateway metrics
+  - job_name: 'api-gateway'
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    static_configs:
+      - targets: ['api-gateway:3000']
+    labels:
+      service: 'api-gateway'
+      team: 'platform'
+      criticality: 'high'
+
+  # Member Service metrics
+  - job_name: 'member-service'
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    static_configs:
+      - targets: ['member-service:4000']
+    labels:
+      service: 'member-service'
+      team: 'platform'
+      criticality: 'high'
+
+  # Event Service metrics
+  - job_name: 'event-service'
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    static_configs:
+      - targets: ['event-service:4001']
+    labels:
+      service: 'event-service'
+      team: 'platform'
+      criticality: 'medium'
+
+  # Analytics Service metrics
+  - job_name: 'analytics-service'
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    static_configs:
+      - targets: ['analytics-service:5000']
+    labels:
+      service: 'analytics-service'
+      team: 'data'
+      criticality: 'medium'
+
+  # Neo4j metrics
+  - job_name: 'neo4j'
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    static_configs:
+      - targets: ['neo4j:7687']
+    labels:
+      service: 'neo4j'
+      team: 'data'
+      criticality: 'high'
+
+  # Redis metrics
+  - job_name: 'redis'
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    static_configs:
+      - targets: ['redis:6379']
+    labels:
+      service: 'redis'
+      team: 'platform'
+      criticality: 'high'
+
+# Recording rules for service metrics
+rule_files:
+  - "recording_rules.yml"
+  - "alert_rules.yml"
+
+recording_rules:
+  groups:
+    - name: service_metrics
+      interval: 1m
+      rules:
+        # Average request duration over 5m
+        - record: job:request_duration_seconds:avg_rate5m
+          expr: rate(http_request_duration_seconds_sum[5m]) / rate(http_request_duration_seconds_count[5m])
+
+        # Error rate over 5m
+        - record: job:request_errors:avg_rate5m
+          expr: rate(http_requests_total{status=~"5.."}[5m])
+
+        # Memory utilization
+        - record: job:node_memory_utilization:avg
+          expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes
+
+        # Graph query performance (95th percentile)
+        - record: job:graph_query_duration_seconds:p95
+          expr: histogram_quantile(0.95, rate(graph_query_duration_seconds_bucket[5m]))
+
+# Alert rules
+alerting_rules:
+  groups:
+    - name: service_alerts
+      rules:
+        # High error rate alert
+        - alert: HighErrorRate
+          expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.1
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: High error rate detected
+            description: Service {{ $labels.service }} has high error rate
+
+        # Service down alert
+        - alert: ServiceDown
+          expr: up == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: Service is down
+            description: Service {{ $labels.service }} is down
+
+        # Slow graph queries alert
+        - alert: SlowGraphQueries
+          expr: job:graph_query_duration_seconds:p95 > 1
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: Slow graph queries detected
+            description: 95th percentile of graph queries exceeding 1s threshold
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanager:9093']
+      timeout: 10s
+      api_version: v2
