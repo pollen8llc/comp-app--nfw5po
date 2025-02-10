@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  namespace: community-platform
+  labels:
+    app: web
+    component: frontend
+    environment: production
+  annotations:
+    prometheus.io/scrape: 'true'
+    prometheus.io/port: '80'
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+      name: http-web
+  selector:
+    app: web
+    component: frontend
+  sessionAffinity: None
+  internalTrafficPolicy: Cluster
