@@ -1,0 +1,216 @@
+import express, { Request, Response, NextFunction } from 'express'; // v4.18.2
+import { v4 as uuidv4 } from 'uuid'; // v9.0.0
+import { z } from 'zod'; // v3.21.4
+import { RateLimiterRedis } from 'rate-limiter-flexible'; // v3.0.0
+import Redis from 'ioredis'; // v5.3.2
+import { Neo4jService } from '../services/neo4j.service';
+import { logger } from '../utils/logger';
+import { validateToken } from '../middleware/auth';
+import { rateLimitMiddleware } from '../middleware/rateLimit';
+
+const router = express.Router();
+
+// Schema Validation
+const EventSchema = z.object({
+  title: z.string().max(200),
+  description: z.string().optional(),
+  startDate: z.string().datetime(),
+  endDate: z.string().datetime(),
+  platform: z.enum(['luma', 'eventbrite', 'partiful']),
+  dataClassification: z.enum(['public', 'internal', 'confidential'])
+});
+
+const ImportEventsSchema = z.object({
+  platform: z.enum(['luma', 'eventbrite', 'partiful']),
+  importConfig: z.record(z.any())
+});
+
+// Error Handler
+const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
+  logger.error('Event Service Error:', { error: err, requestId: req.headers['x-request-id'] });
+  res.status(500).json({
+    code: 'INTERNAL_SERVER_ERROR',
+    message: 'An unexpected error occurred',
+    requestId: req.headers['x-request-id']
+  });
+};
+
+// Apply middleware
+router.use(validateToken);
+router.use(rateLimitMiddleware);
+
+// List events
+router.get('/', async (req: Request, res: Response) => {
+  try {
+    const startDate = req.query.startDate as string;
+    const endDate = req.query.endDate as string;
+    const platform = req.query.platform as string;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    const startTime = Date.now();
+    const events = await Neo4jService.queryEvents({
+      startDate,
+      endDate,
+      platform,
+      page,
+      limit
+    });
+
+    res.header('X-Processing-Time', `${Date.now() - startTime}`);
+    res.header('X-Request-ID', req.headers['x-request-id'] as string);
+    res.json(events);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Create event
+router.post('/', async (req: Request, res: Response) => {
+  try {
+    const eventData = EventSchema.parse(req.body);
+    const eventId = uuidv4();
+
+    const event = await Neo4jService.createEvent({
+      id: eventId,
+      ...eventData,
+      metadata: {
+        importStatus: 'completed',
+        processingMetrics: {
+          processingTime: 0,
+          graphQueryTime: 0
+        }
+      },
+      validationStatus: 'pending'
+    });
+
+    res.status(201).json(event);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      res.status(400).json({
+        code: 'VALIDATION_ERROR',
+        message: 'Invalid event data',
+        details: error.errors
+      });
+      return;
+    }
+    next(error);
+  }
+});
+
+// Get event by ID
+router.get('/:eventId', async (req: Request, res: Response) => {
+  try {
+    const { eventId } = req.params;
+    const event = await Neo4jService.getEventById(eventId);
+
+    if (!event) {
+      res.status(404).json({
+        code: 'NOT_FOUND',
+        message: 'Event not found'
+      });
+      return;
+    }
+
+    res.json(event);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Update event
+router.put('/:eventId', async (req: Request, res: Response) => {
+  try {
+    const { eventId } = req.params;
+    const eventData = EventSchema.parse(req.body);
+
+    const event = await Neo4jService.updateEvent(eventId, eventData);
+
+    if (!event) {
+      res.status(404).json({
+        code: 'NOT_FOUND',
+        message: 'Event not found'
+      });
+      return;
+    }
+
+    res.json(event);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      res.status(400).json({
+        code: 'VALIDATION_ERROR',
+        message: 'Invalid event data',
+        details: error.errors
+      });
+      return;
+    }
+    next(error);
+  }
+});
+
+// Delete event
+router.delete('/:eventId', async (req: Request, res: Response) => {
+  try {
+    const { eventId } = req.params;
+    await Neo4jService.deleteEvent(eventId);
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Bulk update events
+router.put('/', async (req: Request, res: Response) => {
+  try {
+    const events = z.array(EventSchema).parse(req.body);
+    const updatedEvents = await Neo4jService.bulkUpdateEvents(events);
+    
+    res.json({
+      success: true,
+      count: updatedEvents.length,
+      events: updatedEvents
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      res.status(400).json({
+        code: 'VALIDATION_ERROR',
+        message: 'Invalid event data',
+        details: error.errors
+      });
+      return;
+    }
+    next(error);
+  }
+});
+
+// Import events
+router.post('/import', async (req: Request, res: Response) => {
+  try {
+    const importData = ImportEventsSchema.parse(req.body);
+    const jobId = uuidv4();
+
+    // Queue import job
+    await Neo4jService.queueEventImport(jobId, importData);
+
+    res.status(202).json({
+      jobId,
+      status: 'accepted',
+      message: 'Event import job queued successfully'
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      res.status(400).json({
+        code: 'VALIDATION_ERROR',
+        message: 'Invalid import configuration',
+        details: error.errors
+      });
+      return;
+    }
+    next(error);
+  }
+});
+
+// Error handling middleware
+router.use(errorHandler);
+
+export default router;
