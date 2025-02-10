@@ -1,0 +1,159 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: platform-config
+  namespace: community-platform
+  labels:
+    app: community-platform
+    environment: production
+data:
+  api_gateway.yaml: |
+    port: 3000
+    cors:
+      allowedOrigins:
+        - https://*.community-platform.com
+        - https://admin.community-platform.com
+      allowedMethods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - OPTIONS
+      allowedHeaders:
+        - Content-Type
+        - Authorization
+        - X-Request-ID
+      maxAge: 86400
+      credentials: true
+    rateLimit:
+      windowMs: 60000
+      maxRequests: 1000
+      skipSuccessfulRequests: false
+      headers: true
+    auth:
+      jwtExpiryTime: 3600
+      refreshTokenExpiry: 604800
+      sessionTimeout: 1800
+      maxConcurrentSessions: 3
+    security:
+      tlsVersion: TLSv1.3
+      cipherSuites:
+        - TLS_AES_256_GCM_SHA384
+      hsts:
+        enabled: true
+        maxAge: 31536000
+    monitoring:
+      metrics:
+        enabled: true
+        path: /metrics
+        port: 9090
+      health:
+        path: /health
+        port: 3000
+
+  analytics_service.yaml: |
+    port: 5000
+    grpc:
+      maxMessageSize: 10MB
+      keepalive: 30
+      timeout: 60
+      retries: 3
+    tda:
+      epsilon: 0.5
+      minPoints: 15
+      dimension: 2
+      persistence: 0.3
+      distanceMetric: euclidean
+      maxComputationTime: 300
+    monitoring:
+      metrics:
+        enabled: true
+        path: /metrics
+        port: 9090
+        scrapeInterval: 15s
+      tracing:
+        enabled: true
+        samplingRate: 0.1
+    resources:
+      cpu:
+        limit: "2"
+        request: "1"
+      memory:
+        limit: 4Gi
+        request: 2Gi
+
+  event_service.yaml: |
+    port: 4001
+    grpc:
+      maxMessageSize: 5MB
+      keepalive: 30
+      timeout: 30
+      retries: 3
+    integrations:
+      luma:
+        apiVersion: v1
+        timeout: 30000
+        retryAttempts: 3
+        rateLimitPerMinute: 100
+      eventbrite:
+        apiVersion: v3
+        timeout: 30000
+        retryAttempts: 3
+        rateLimitPerMinute: 100
+      partiful:
+        apiVersion: v1
+        timeout: 30000
+        retryAttempts: 3
+        rateLimitPerMinute: 100
+    monitoring:
+      metrics:
+        enabled: true
+        path: /metrics
+        port: 9090
+      health:
+        path: /health
+        port: 4001
+
+  member_service.yaml: |
+    port: 4000
+    grpc:
+      maxMessageSize: 5MB
+      keepalive: 30
+      timeout: 30
+      retries: 3
+    entityResolution:
+      confidenceThreshold: 0.8
+      maxCandidates: 5
+      matchingAlgorithm: hybrid
+      cacheResults: true
+      maxProcessingTime: 60
+    neo4j:
+      host: neo4j-service
+      port: 7687
+      database: community
+      maxConnectionPoolSize: 100
+      connectionTimeout: 5000
+      encryption: true
+    monitoring:
+      metrics:
+        enabled: true
+        path: /metrics
+        port: 9090
+      health:
+        path: /health
+        port: 4000
+
+  redis.yaml: |
+    host: redis-service
+    port: 6379
+    maxMemory: 2gb
+    maxMemoryPolicy: allkeys-lru
+    evictionPolicy: volatile-ttl
+    keyspaceEvents: Ex
+    persistence:
+      enabled: true
+      saveInterval: 300
+      minChanges: 10
+    security:
+      encryption: true
+      tlsVersion: TLSv1.3
