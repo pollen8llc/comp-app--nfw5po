@@ -1,0 +1,36 @@
+{
+  "name": "Community Management Platform",
+  "short_name": "CMP",
+  "description": "Advanced community data management and analysis platform with graph visualization",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "orientation": "any",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "32x32 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "assets/icons/graph.svg",
+      "sizes": "24x24",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "prefer_related_applications": false,
+  "categories": [
+    "productivity",
+    "analytics",
+    "business"
+  ],
+  "dir": "ltr",
+  "lang": "en",
+  "display_override": [
+    "standalone",
+    "browser"
+  ]
+}
