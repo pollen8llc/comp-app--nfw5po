@@ -1,0 +1,379 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "Event Service Overview",
+      "type": "row",
+      "collapse": false,
+      "panels": [
+        {
+          "title": "Event Import Success Rate",
+          "type": "gauge",
+          "datasource": "Prometheus",
+          "targets": [
+            {
+              "expr": "rate(community_platform_event_import_success_total[5m]) / rate(community_platform_event_import_total[5m]) * 100",
+              "legendFormat": "Success Rate",
+              "interval": "30s",
+              "instant": false
+            }
+          ],
+          "thresholds": [
+            {
+              "value": 90,
+              "color": "green",
+              "op": "gt"
+            },
+            {
+              "value": 75,
+              "color": "yellow",
+              "op": "gt"
+            },
+            {
+              "value": 0,
+              "color": "red",
+              "op": "gt"
+            }
+          ],
+          "format": "percent",
+          "min": 0,
+          "max": 100,
+          "decimals": 2
+        },
+        {
+          "title": "Event Import Duration",
+          "type": "graph",
+          "datasource": "Prometheus",
+          "targets": [
+            {
+              "expr": "rate(community_platform_event_import_duration_seconds_sum[5m]) / rate(community_platform_event_import_duration_seconds_count[5m])",
+              "legendFormat": "Average Duration",
+              "interval": "30s"
+            }
+          ],
+          "yaxes": [
+            {
+              "format": "s",
+              "label": "Duration",
+              "min": 0
+            }
+          ],
+          "tooltip": {
+            "shared": true,
+            "sort": 2,
+            "value_type": "individual"
+          }
+        }
+      ]
+    },
+    {
+      "title": "Platform Integration Metrics",
+      "type": "row",
+      "collapse": false,
+      "panels": [
+        {
+          "title": "Events by Platform",
+          "type": "piechart",
+          "datasource": "Prometheus",
+          "targets": [
+            {
+              "expr": "sum(community_platform_events_total) by (platform)",
+              "legendFormat": "{{platform}}",
+              "instant": true
+            }
+          ],
+          "pieType": "donut",
+          "legend": {
+            "show": true,
+            "values": true,
+            "percentage": true
+          }
+        },
+        {
+          "title": "Platform API Response Times",
+          "type": "graph",
+          "datasource": "Prometheus",
+          "targets": [
+            {
+              "expr": "rate(community_platform_platform_api_duration_seconds_sum{platform=~\"luma|eventbrite|partiful\"}[5m]) / rate(community_platform_platform_api_duration_seconds_count[5m])",
+              "legendFormat": "{{platform}}",
+              "interval": "30s"
+            }
+          ],
+          "yaxes": [
+            {
+              "format": "s",
+              "label": "Response Time",
+              "min": 0
+            }
+          ],
+          "alert": {
+            "name": "High API Latency",
+            "conditions": [
+              {
+                "evaluator": {
+                  "type": "gt",
+                  "params": [2]
+                },
+                "operator": {
+                  "type": "and"
+                },
+                "query": {
+                  "params": ["A", "5m", "now"]
+                },
+                "reducer": {
+                  "type": "avg",
+                  "params": []
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Event Operations",
+      "type": "row",
+      "collapse": false,
+      "panels": [
+        {
+          "title": "Event CRUD Operations",
+          "type": "graph",
+          "datasource": "Prometheus",
+          "targets": [
+            {
+              "expr": "rate(community_platform_event_operations_total{operation=~\"create|update|delete\"}[5m])",
+              "legendFormat": "{{operation}}",
+              "interval": "30s"
+            }
+          ],
+          "stack": true,
+          "percentage": false,
+          "yaxes": [
+            {
+              "format": "ops",
+              "label": "Operations/sec",
+              "min": 0
+            }
+          ]
+        },
+        {
+          "title": "Event Cache Performance",
+          "type": "graph",
+          "datasource": "Prometheus",
+          "targets": [
+            {
+              "expr": "rate(community_platform_event_cache_hits_total[5m])",
+              "legendFormat": "Cache Hits",
+              "interval": "30s"
+            },
+            {
+              "expr": "rate(community_platform_event_cache_misses_total[5m])",
+              "legendFormat": "Cache Misses",
+              "interval": "30s"
+            }
+          ],
+          "yaxes": [
+            {
+              "format": "ops",
+              "label": "Operations/sec",
+              "min": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Event Participation Metrics",
+      "type": "row",
+      "collapse": false,
+      "panels": [
+        {
+          "title": "Participant Operations",
+          "type": "graph",
+          "datasource": "Prometheus",
+          "targets": [
+            {
+              "expr": "rate(community_platform_event_participant_operations_total{operation=~\"add|remove\"}[5m])",
+              "legendFormat": "{{operation}}",
+              "interval": "30s"
+            }
+          ],
+          "stack": true,
+          "yaxes": [
+            {
+              "format": "ops",
+              "label": "Operations/sec",
+              "min": 0
+            }
+          ]
+        },
+        {
+          "title": "Average Participants per Event",
+          "type": "stat",
+          "datasource": "Prometheus",
+          "targets": [
+            {
+              "expr": "sum(community_platform_event_participants_total) / count(community_platform_events_total)",
+              "legendFormat": "Avg Participants",
+              "instant": true
+            }
+          ],
+          "format": "none",
+          "decimals": 1,
+          "colorMode": "value",
+          "graphMode": "area"
+        }
+      ]
+    },
+    {
+      "title": "Error Tracking",
+      "type": "row",
+      "collapse": false,
+      "panels": [
+        {
+          "title": "Event Service Errors",
+          "type": "graph",
+          "datasource": "Prometheus",
+          "targets": [
+            {
+              "expr": "rate(community_platform_event_errors_total{type=~\"import|validation|database\"}[5m])",
+              "legendFormat": "{{type}}",
+              "interval": "30s"
+            }
+          ],
+          "alert": {
+            "name": "High Error Rate",
+            "conditions": [
+              {
+                "evaluator": {
+                  "type": "gt",
+                  "params": [10]
+                },
+                "operator": {
+                  "type": "and"
+                },
+                "query": {
+                  "params": ["A", "5m", "now"]
+                },
+                "reducer": {
+                  "type": "sum",
+                  "params": []
+                }
+              }
+            ]
+          }
+        },
+        {
+          "title": "Platform Integration Errors",
+          "type": "table",
+          "datasource": "Prometheus",
+          "targets": [
+            {
+              "expr": "sum(increase(community_platform_platform_errors_total{platform=~\"luma|eventbrite|partiful\"}[24h])) by (platform, error_type)",
+              "legendFormat": "{{platform}} - {{error_type}}",
+              "instant": true
+            }
+          ],
+          "transformations": [
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {},
+                "indexByName": {},
+                "renameByName": {
+                  "platform": "Platform",
+                  "error_type": "Error Type",
+                  "Value": "Count (24h)"
+                }
+              }
+            }
+          ],
+          "styles": [
+            {
+              "pattern": "Count",
+              "type": "number",
+              "decimals": 0,
+              "colorMode": "cell",
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "value": 0,
+                    "color": "green"
+                  },
+                  {
+                    "value": 10,
+                    "color": "yellow"
+                  },
+                  {
+                    "value": 50,
+                    "color": "red"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 27,
+  "style": "dark",
+  "tags": ["events", "monitoring"],
+  "templating": {
+    "list": [
+      {
+        "name": "platform",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(community_platform_events_total, platform)",
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "multi": true,
+        "includeAll": true
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "browser",
+  "title": "Event Service Dashboard",
+  "uid": "event-service-dashboard",
+  "version": 1
+}
