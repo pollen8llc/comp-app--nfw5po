@@ -1,0 +1,154 @@
+lockfileVersion: 5.4
+
+importers:
+  .:
+    dependencies:
+      '@clerk/clerk-sdk-node': 4.10.0
+      '@grpc/grpc-js': 1.9.0
+      '@grpc/proto-loader': 0.7.9
+      '@nestjs/cache-manager': 2.0.0
+      '@nestjs/common': 10.0.0
+      '@nestjs/throttler': 5.0.0
+      '@opentelemetry/api': 1.4.0
+      axios: 1.6.0
+      cache-manager: 5.2.0
+      compression: 1.7.4
+      cors: 2.8.5
+      crypto-js: 4.1.1
+      csv-parse: 5.5.0
+      dotenv: 16.3.1
+      envalid: 7.3.1
+      express: 4.18.2
+      express-cache-middleware: 1.0.0
+      express-graphql: 0.12.0
+      express-rate-limit: 6.7.0
+      express-redis-cache: 1.1.3
+      express-validator: 7.0.0
+      google-protobuf: 3.21.0
+      helmet: 7.0.0
+      http-status-codes: 2.2.0
+      ioredis: 5.3.2
+      jsonwebtoken: 9.0.0
+      lz4-js: 0.4.1
+      morgan: 1.10.0
+      neo4j-driver: 5.12.0
+      neo4j-query-builder: 2.0.0
+      newrelic: 10.3.0
+      newrelic-winston: 2.0.0
+      opossum: 7.1.0
+      pino: 8.15.0
+      pino-pretty: 10.0.0
+      prom-client: 14.2.0
+      protobuf: 4.21.0
+      protobufjs: 7.2.0
+      rate-limit-redis: 3.0.0
+      rate-limiter-flexible: 2.4.1
+      retry: 0.13.0
+      retry-axios: 3.0.0
+      uuid: 9.0.0
+      winston: 3.10.0
+      winston-daily-rotate-file: 4.7.0
+      zod: 3.22.0
+    devDependencies:
+      '@faker-js/faker': 8.0.0
+      '@jest/globals': 29.0.0
+      '@openapi-types/openapi-types': 12.1.3
+      '@types/cors': 2.8.0
+      '@types/http-status-codes': 1.2.0
+      '@types/jest': 29.5.0
+      '@types/node': 18.0.0
+      awilix: 8.0.0
+      eslint: 8.39.0
+      jest: 29.5.0
+      jest-mock-express: 0.2.0
+      nock: 13.3.0
+      openapi-generator: 6.0.0
+      openapi-types: 12.1.3
+      openapi-typescript: 6.2.0
+      prettier: 2.8.8
+      rimraf: 5.0.0
+      supertest: 6.3.0
+      ts-jest: 29.0.0
+      ts-node-dev: 2.0.0
+      typescript: 5.0.4
+
+  api-gateway:
+    dependencies:
+      '@clerk/clerk-sdk-node': 4.10.0
+      '@grpc/grpc-js': 1.9.0
+      express: 4.18.2
+      express-graphql: 0.12.0
+      helmet: 7.0.0
+      pino: 8.15.0
+    devDependencies:
+      '@types/express': 4.17.17
+      typescript: 5.0.4
+
+  member-service:
+    dependencies:
+      '@grpc/grpc-js': 1.9.0
+      neo4j-driver: 5.12.0
+      pino: 8.15.0
+      zod: 3.22.0
+    devDependencies:
+      typescript: 5.0.4
+
+  event-service:
+    dependencies:
+      '@grpc/grpc-js': 1.9.0
+      neo4j-driver: 5.12.0
+      pino: 8.15.0
+      zod: 3.22.0
+    devDependencies:
+      typescript: 5.0.4
+
+  analytics-service:
+    dependencies:
+      '@grpc/grpc-js': 1.9.0
+      neo4j-driver: 5.12.0
+      numpy: 1.24.0
+      networkx: 3.0.0
+      pino: 8.15.0
+      scipy: 1.10.0
+    devDependencies:
+      '@types/numpy': 1.24.0
+      '@types/networkx': 3.0.0
+      typescript: 5.0.4
+
+packages:
+  /@clerk/clerk-sdk-node/4.10.0:
+    integrity: sha512-xJ8tPqR7YQK9kQJ9vFX+qWXL1234...
+    dependencies:
+      axios: 1.6.0
+      jsonwebtoken: 9.0.0
+    resolution:
+      integrity: sha512-xJ8tPqR7YQK9kQJ9vFX+qWXL1234...
+
+  /@grpc/grpc-js/1.9.0:
+    integrity: sha512-XvB1RgZ9HqYd3h1234...
+    dependencies:
+      '@grpc/proto-loader': 0.7.9
+      google-protobuf: 3.21.0
+    resolution:
+      integrity: sha512-XvB1RgZ9HqYd3h1234...
+
+  # Additional package definitions with integrity hashes...
+
+settings:
+  autoInstallPeers: true
+  dedupePeerDependencies: true
+  nodeLinker: hoisted
+  strictPeerDependencies: false
+  supportedArchitectures:
+    cpu:
+      - x64
+      - arm64
+    os:
+      - linux
+      - darwin
+      - win32
+
+preferredVersions:
+  typescript: 5.0.4
+  node: '>=18.0.0'
+  pnpm: '>=8.0.0'
