@@ -1,0 +1,180 @@
+{
+  "nodes": [
+    {
+      "id": "member-1",
+      "type": "MEMBER",
+      "label": "John Doe",
+      "properties": {
+        "email": "john@example.com",
+        "location": "San Francisco",
+        "joinDate": "2023-01-15T08:00:00Z",
+        "status": "active",
+        "visibility": "public",
+        "tags": ["tech", "startup"],
+        "role": "MEMBER"
+      }
+    },
+    {
+      "id": "member-2", 
+      "type": "MEMBER",
+      "label": "Jane Smith",
+      "properties": {
+        "email": "jane@example.com",
+        "location": "New York",
+        "joinDate": "2023-02-20T10:30:00Z",
+        "status": "active",
+        "visibility": "private",
+        "tags": ["finance", "tech"],
+        "role": "ANALYST"
+      }
+    },
+    {
+      "id": "event-1",
+      "type": "EVENT",
+      "label": "Tech Meetup 2023",
+      "properties": {
+        "date": "2023-12-01T18:00:00Z",
+        "platform": "Luma",
+        "category": "networking",
+        "capacity": 100,
+        "status": "completed",
+        "tags": ["technology", "networking"],
+        "location": "San Francisco"
+      }
+    },
+    {
+      "id": "social-1",
+      "type": "SOCIAL_PROFILE",
+      "label": "LinkedIn Profile",
+      "properties": {
+        "platform": "LINKEDIN",
+        "externalId": "linkedin-123",
+        "verified": true,
+        "lastSynced": "2023-11-01T12:00:00Z"
+      }
+    },
+    {
+      "id": "metadata-1",
+      "type": "METADATA",
+      "label": "Professional Info",
+      "properties": {
+        "key": "skills",
+        "value": ["JavaScript", "React", "Node.js"],
+        "source": "linkedin",
+        "lastUpdated": "2023-11-01T12:00:00Z",
+        "confidence": 0.95
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-1",
+      "type": "KNOWS",
+      "source": "member-1",
+      "target": "member-2",
+      "properties": {
+        "strength": 0.8,
+        "last_interaction": "2023-11-15T14:30:00Z",
+        "interaction_count": 15,
+        "connection_date": "2023-03-01T09:00:00Z",
+        "tags": ["professional", "mentor"]
+      }
+    },
+    {
+      "id": "edge-2",
+      "type": "ATTENDED",
+      "source": "member-1",
+      "target": "event-1",
+      "properties": {
+        "role": "speaker",
+        "timestamp": "2023-12-01T18:00:00Z",
+        "registration_date": "2023-11-01T10:00:00Z",
+        "feedback_score": 4.8
+      }
+    },
+    {
+      "id": "edge-3",
+      "type": "ATTENDED",
+      "source": "member-2",
+      "target": "event-1",
+      "properties": {
+        "role": "attendee",
+        "timestamp": "2023-12-01T18:00:00Z",
+        "registration_date": "2023-11-05T15:30:00Z",
+        "feedback_score": 4.5
+      }
+    },
+    {
+      "id": "edge-4",
+      "type": "HAS_PROFILE",
+      "source": "member-1",
+      "target": "social-1",
+      "properties": {
+        "verified": true,
+        "connected_date": "2023-01-15T08:00:00Z",
+        "last_sync": "2023-11-15T08:00:00Z"
+      }
+    },
+    {
+      "id": "edge-5",
+      "type": "HAS_METADATA",
+      "source": "member-1",
+      "target": "metadata-1",
+      "properties": {
+        "confidence": 0.95,
+        "timestamp": "2023-11-01T12:00:00Z",
+        "last_verified": "2023-11-15T08:00:00Z",
+        "source_system": "linkedin_api"
+      }
+    }
+  ],
+  "metadata": {
+    "version": "1.0.0",
+    "timestamp": 1700150400000
+  },
+  "layout": {
+    "dimensions": {
+      "width": 800,
+      "height": 600,
+      "margin": 40
+    },
+    "nodes": {
+      "size": {
+        "MEMBER": 25,
+        "EVENT": 22,
+        "SOCIAL_PROFILE": 20,
+        "METADATA": 18
+      },
+      "color": {
+        "MEMBER": "#4A90E2",
+        "EVENT": "#F5A623",
+        "SOCIAL_PROFILE": "#7ED321",
+        "METADATA": "#9013FE"
+      },
+      "labelSize": 12
+    },
+    "edges": {
+      "width": 2,
+      "color": {
+        "KNOWS": "#B8C4CE",
+        "ATTENDED": "#F5A623",
+        "HAS_PROFILE": "#7ED321",
+        "HAS_METADATA": "#9013FE"
+      },
+      "opacity": 0.7
+    },
+    "animation": {
+      "duration": 300,
+      "ease": "easeInOut",
+      "staggerChildren": 50
+    },
+    "interaction": {
+      "zoomRange": [0.1, 4],
+      "dragEnabled": true
+    },
+    "performance": {
+      "maxNodes": 1000,
+      "maxEdges": 2000
+    }
+  }
+}
