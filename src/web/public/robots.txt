@@ -1,0 +1,25 @@
+# Version: 1.0
+# Last Updated: 2024
+
+# Default User Agent Rules
+User-agent: *
+
+# Allow public routes
+Allow: /$
+Allow: /member$
+Allow: /member/public/*
+
+# Protect sensitive routes
+Disallow: /admin/*
+Disallow: /api/*
+Disallow: /member/profile/*
+Disallow: /member/network/*
+Disallow: /member/events/*
+Disallow: /member/analytics/*
+Disallow: /member/settings/*
+
+# Basic rate limiting for non-major search engines
+Crawl-delay: 10
+
+# XML Sitemap reference
+Sitemap: https://${DOMAIN}/sitemap.xml
