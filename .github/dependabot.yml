@@ -1,0 +1,149 @@
+version: 2
+updates:
+  # Node.js services and web frontend dependency updates
+  - package-ecosystem: "npm"
+    directory: "/src/backend/api-gateway"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "02:00"
+      timezone: "UTC"
+    versioning-strategy: "auto"
+    allow:
+      - dependency-type: "all"
+        update-types: ["patch", "minor"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["major"]
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    reviewers:
+      - "CODEOWNERS"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 10
+    rebase-strategy: "auto"
+    
+  - package-ecosystem: "npm"
+    directory: "/src/backend/event-service"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "02:00"
+      timezone: "UTC"
+    versioning-strategy: "auto"
+    allow:
+      - dependency-type: "all"
+        update-types: ["patch", "minor"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["major"]
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    reviewers:
+      - "CODEOWNERS"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 10
+    rebase-strategy: "auto"
+
+  - package-ecosystem: "npm"
+    directory: "/src/backend/member-service"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "02:00"
+      timezone: "UTC"
+    versioning-strategy: "auto"
+    allow:
+      - dependency-type: "all"
+        update-types: ["patch", "minor"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["major"]
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    reviewers:
+      - "CODEOWNERS"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 10
+    rebase-strategy: "auto"
+
+  - package-ecosystem: "npm"
+    directory: "/src/web"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "02:00"
+      timezone: "UTC"
+    versioning-strategy: "auto"
+    allow:
+      - dependency-type: "all"
+        update-types: ["patch", "minor"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["major"]
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    reviewers:
+      - "CODEOWNERS"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 10
+    rebase-strategy: "auto"
+
+  # Python analytics service dependency updates
+  - package-ecosystem: "pip"
+    directory: "/src/backend/analytics-service"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "03:00"
+      timezone: "UTC"
+    versioning-strategy: "auto"
+    allow:
+      - dependency-type: "all"
+        update-types: ["patch", "minor"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["major"]
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    reviewers:
+      - "CODEOWNERS"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 5
+    rebase-strategy: "auto"
+
+  # Infrastructure code dependency updates
+  - package-ecosystem: "terraform"
+    directory: "/infrastructure/terraform"
+    schedule:
+      interval: "monthly"
+      day: "first-sunday"
+      time: "04:00"
+      timezone: "UTC"
+    versioning-strategy: "auto"
+    allow:
+      - dependency-type: "all"
+        update-types: ["patch"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["minor", "major"]
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    reviewers:
+      - "CODEOWNERS"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+    open-pull-requests-limit: 3
+    rebase-strategy: "auto"
