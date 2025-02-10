@@ -1,0 +1,164 @@
+config:
+  # artillery-plugin-expect@2.0.0
+  # artillery-plugin-metrics-by-endpoint@1.0.0
+  plugins:
+    expect: {}
+    metrics-by-endpoint: {}
+
+  target: "wss://api.community-platform.com/ws"
+  
+  phases:
+    - name: "Ramp up load"
+      duration: 300
+      arrivalRate: 5
+      rampTo: 50
+    - name: "Sustained load"
+      duration: 1800
+      arrivalRate: 50
+    - name: "Ramp down"
+      duration: 300
+      arrivalRate: 50
+      rampTo: 5
+
+  ws:
+    # WebSocket subprotocol for GraphQL subscriptions
+    subprotocols: ["graphql-ws"]
+
+  # Performance thresholds based on requirements
+  thresholds:
+    ws.response_time.p95: 200
+    ws.response_time.p99: 1000
+    tdaComputation.p95: 5000
+    eventImport.p95: 30000
+
+  variables:
+    graphUpdateInterval: 1000  # 1 second interval for graph updates
+    analysisTimeout: 5000      # 5 second timeout for TDA computation
+    importTimeout: 30000       # 30 second timeout for imports
+
+before:
+  flow:
+    - function: "beforeScenario"
+      weight: 1
+
+after:
+  flow:
+    - function: "afterScenario"
+      weight: 1
+
+scenarios:
+  - name: "graph.update"
+    weight: 50
+    engine: "ws"
+    flow:
+      - connect: "{{target}}"
+      - think: 1
+      - send:
+          channel: "graphql-ws"
+          data: |
+            {
+              "type": "subscribe",
+              "payload": {
+                "query": "subscription { graphUpdates { nodes { id type } edges { source target } } }"
+              }
+            }
+      - think: "{{ $randomNumber(1, 5) }}"
+      - expect:
+          channel: "graphql-ws"
+          data:
+            - type: "next"
+            - payload:
+                data:
+                  graphUpdates:
+                    nodes: "_.isArray"
+                    edges: "_.isArray"
+      - think: "{{ graphUpdateInterval }}"
+      - close: 1000
+
+  - name: "analysis.complete"
+    weight: 25
+    engine: "ws"
+    flow:
+      - connect: "{{target}}"
+      - think: 1
+      - send:
+          channel: "graphql-ws"
+          data: |
+            {
+              "type": "subscribe",
+              "payload": {
+                "query": "subscription { analysisComplete { jobId status results { persistenceDiagram clusters } } }"
+              }
+            }
+      - think: "{{ $randomNumber(1, 3) }}"
+      - expect:
+          channel: "graphql-ws"
+          data:
+            - type: "next"
+            - payload:
+                data:
+                  analysisComplete:
+                    jobId: "_.isString"
+                    status: "success"
+                    results: "_.isObject"
+      - think: "{{ analysisTimeout }}"
+      - close: 1000
+
+  - name: "import.progress"
+    weight: 25
+    engine: "ws"
+    flow:
+      - connect: "{{target}}"
+      - think: 1
+      - send:
+          channel: "graphql-ws"
+          data: |
+            {
+              "type": "subscribe",
+              "payload": {
+                "query": "subscription { importProgress { jobId status progress totalItems processedItems } }"
+              }
+            }
+      - think: "{{ $randomNumber(1, 3) }}"
+      - expect:
+          channel: "graphql-ws"
+          data:
+            - type: "next"
+            - payload:
+                data:
+                  importProgress:
+                    jobId: "_.isString"
+                    status: "_.isString"
+                    progress: "_.isNumber"
+                    totalItems: "_.isNumber"
+                    processedItems: "_.isNumber"
+      - think: "{{ importTimeout }}"
+      - close: 1000
+
+functions:
+  beforeScenario: |
+    module.exports = function(context, events, done) {
+      // Initialize metrics collection
+      context.vars.startTime = Date.now();
+      context.vars.messageCount = 0;
+      
+      // Set up authentication token
+      context.vars.authToken = "Bearer " + context.vars.token;
+      
+      return done();
+    }
+
+  afterScenario: |
+    module.exports = function(context, events, done) {
+      // Calculate and log metrics
+      const duration = Date.now() - context.vars.startTime;
+      const messageRate = context.vars.messageCount / (duration / 1000);
+      
+      events.emit("metrics", {
+        name: context.vars.scenarioName,
+        duration: duration,
+        messageRate: messageRate
+      });
+      
+      return done();
+    }
