@@ -1,0 +1,351 @@
+openapi: 3.0.0
+info:
+  title: Member Service API
+  version: 1.0.0
+  description: API for member management, profile operations, and entity resolution with 95% accuracy in disambiguation
+  contact:
+    name: Community Platform Team
+    email: platform-support@example.com
+
+servers:
+  - url: /api/v1/members
+    description: Member service API endpoint
+
+components:
+  schemas:
+    Profile:
+      type: object
+      required:
+        - name
+        - email
+        - dataClassification
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 100
+          pattern: ^[a-zA-Z\s\-']+$
+          example: "John Doe"
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          example: "john.doe@example.com"
+          x-classification: CONFIDENTIAL
+        location:
+          type: string
+          maxLength: 100
+          example: "San Francisco"
+        bio:
+          type: string
+          maxLength: 500
+        dataClassification:
+          type: string
+          enum: [PUBLIC, INTERNAL, CONFIDENTIAL, RESTRICTED]
+
+    SocialProfile:
+      type: object
+      required:
+        - platform
+        - externalId
+        - authData
+        - verified
+      properties:
+        platform:
+          type: string
+          enum: [LINKEDIN, GMAIL]
+        externalId:
+          type: string
+          maxLength: 255
+        authData:
+          type: object
+          x-classification: RESTRICTED
+          properties:
+            accessToken:
+              type: string
+            refreshToken:
+              type: string
+            expiresAt:
+              type: integer
+              format: int64
+        verified:
+          type: boolean
+        lastSynced:
+          type: string
+          format: date-time
+
+    Member:
+      type: object
+      required:
+        - id
+        - profile
+        - socialProfiles
+        - createdAt
+        - updatedAt
+        - lastActivity
+        - entityStatus
+      properties:
+        id:
+          type: string
+          format: uuid
+        profile:
+          $ref: '#/components/schemas/Profile'
+        socialProfiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/SocialProfile'
+          maxItems: 10
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        lastActivity:
+          type: string
+          format: date-time
+        entityStatus:
+          type: object
+          properties:
+            isResolved:
+              type: boolean
+            confidence:
+              type: number
+              minimum: 0
+              maximum: 1
+            lastResolutionDate:
+              type: string
+              format: date-time
+              nullable: true
+
+    CreateMemberRequest:
+      type: object
+      required:
+        - profile
+        - socialProfiles
+      properties:
+        profile:
+          $ref: '#/components/schemas/Profile'
+        socialProfiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/SocialProfile'
+          minItems: 1
+          maxItems: 10
+
+    UpdateMemberRequest:
+      type: object
+      properties:
+        profile:
+          $ref: '#/components/schemas/Profile'
+        socialProfiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/SocialProfile'
+          maxItems: 10
+
+    ResolveMemberEntityRequest:
+      type: object
+      required:
+        - sourceId
+        - targetId
+      properties:
+        sourceId:
+          type: string
+          format: uuid
+        targetId:
+          type: string
+          format: uuid
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        resolutionMetadata:
+          type: object
+          additionalProperties: true
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+  parameters:
+    MemberId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Member unique identifier
+
+paths:
+  /:
+    post:
+      summary: Create a new member
+      operationId: createMember
+      tags: [Members]
+      security:
+        - BearerAuth: []
+        - ApiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMemberRequest'
+      responses:
+        '201':
+          description: Member created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Member'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Rate limit exceeded
+      x-rateLimit:
+        requests: 100
+        period: 60
+
+  /{id}:
+    get:
+      summary: Get member by ID
+      operationId: getMember
+      tags: [Members]
+      security:
+        - BearerAuth: []
+        - ApiKey: []
+      parameters:
+        - $ref: '#/components/parameters/MemberId'
+      responses:
+        '200':
+          description: Member found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Member'
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+              example: 'max-age=300'
+        '404':
+          description: Member not found
+      x-rateLimit:
+        requests: 1000
+        period: 60
+
+    put:
+      summary: Update member
+      operationId: updateMember
+      tags: [Members]
+      security:
+        - BearerAuth: []
+        - ApiKey: []
+      parameters:
+        - $ref: '#/components/parameters/MemberId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMemberRequest'
+      responses:
+        '200':
+          description: Member updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Member'
+        '400':
+          description: Invalid request
+        '404':
+          description: Member not found
+      x-rateLimit:
+        requests: 100
+        period: 60
+
+    delete:
+      summary: Delete member
+      operationId: deleteMember
+      tags: [Members]
+      security:
+        - BearerAuth: []
+        - ApiKey: []
+      parameters:
+        - $ref: '#/components/parameters/MemberId'
+      responses:
+        '204':
+          description: Member deleted successfully
+        '404':
+          description: Member not found
+      x-rateLimit:
+        requests: 50
+        period: 60
+
+  /resolve:
+    post:
+      summary: Resolve member entity duplicates
+      operationId: resolveMemberEntity
+      tags: [Members]
+      security:
+        - BearerAuth: []
+        - ApiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolveMemberEntityRequest'
+      responses:
+        '200':
+          description: Entity resolution completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Member'
+        '400':
+          description: Invalid request
+        '409':
+          description: Resolution conflict
+      x-rateLimit:
+        requests: 50
+        period: 60
+
+security:
+  - BearerAuth: []
+  - ApiKey: []
+
+tags:
+  - name: Members
+    description: Member management operations
+
+x-components:
+  encryption:
+    algorithm: AES-256-GCM
+    fields:
+      - path: $.profile.email
+        classification: CONFIDENTIAL
+      - path: $.socialProfiles[*].authData
+        classification: RESTRICTED
