@@ -1,0 +1,150 @@
+config:
+  target: "http://api.community-platform.local"
+  phases:
+    - duration: 300
+      arrivalRate: 5
+      rampTo: 50
+      name: "Warm up"
+    - duration: 1800
+      arrivalRate: 50
+      name: "Sustained load"
+    - duration: 300
+      arrivalRate: 50
+      rampTo: 100
+      name: "Stress test"
+  plugins:
+    expect: {}
+    metrics-by-endpoint: {}
+    custom-metrics:
+      js: "./metrics-collector.js"
+  processor: "./test-data-generator.js"
+  variables:
+    queryTypes: ["simple", "complex"]
+    dimensions: [2, 3]
+
+scenarios:
+  - name: "Member Service Load Test"
+    weight: 40
+    flow:
+      - post:
+          url: "/api/v1/members"
+          beforeRequest: "generateMemberData"
+          json:
+            name: "{{ $processEnvironment.MEMBER_NAME }}"
+            email: "{{ $processEnvironment.MEMBER_EMAIL }}"
+          expect:
+            - statusCode: 201
+            - contentType: "application/json"
+          afterResponse: "validateResponseTime"
+          capture:
+            - json: "$.id"
+              as: "memberId"
+
+      - get:
+          url: "/api/v1/members/{{ memberId }}"
+          expect:
+            - statusCode: 200
+            - maxResponseTime: 200
+
+      - put:
+          url: "/api/v1/members/{{ memberId }}"
+          beforeRequest: "generateMemberUpdateData"
+          json:
+            location: "{{ location }}"
+          expect:
+            - statusCode: 200
+            - maxResponseTime: 500
+
+      - post:
+          url: "/api/v1/members/resolve"
+          json:
+            entityData: "{{ $processEnvironment.ENTITY_DATA }}"
+          expect:
+            - statusCode: 200
+            - maxResponseTime: 500
+
+      - delete:
+          url: "/api/v1/members/{{ memberId }}"
+          expect:
+            - statusCode: 204
+            - maxResponseTime: 200
+
+  - name: "Analytics Service Load Test"
+    weight: 30
+    flow:
+      - post:
+          url: "/api/v1/analytics/graph-query"
+          beforeRequest: "generateGraphQuery"
+          json:
+            queryType: "{{ $loopElement.queryTypes }}"
+            parameters: "{{ queryParams }}"
+          expect:
+            - statusCode: 200
+            - maxResponseTime: "{{ queryType === 'simple' ? 200 : 1000 }}"
+          afterResponse: "recordQueryMetrics"
+
+      - post:
+          url: "/api/v1/analytics/tda"
+          json:
+            epsilon: 0.5
+            minPoints: 15
+            dimension: "{{ $loopElement.dimensions }}"
+            persistenceThreshold: 0.3
+            distanceMetric: "euclidean"
+          expect:
+            - statusCode: 200
+            - maxResponseTime: 5000
+
+      - get:
+          url: "/api/v1/analytics/network-metrics"
+          expect:
+            - statusCode: 200
+            - maxResponseTime: 1000
+
+  - name: "Event Service Load Test"
+    weight: 30
+    flow:
+      - post:
+          url: "/api/v1/events/import"
+          beforeRequest: "generateEventData"
+          json:
+            platform: "{{ platform }}"
+            eventData: "{{ eventData }}"
+          expect:
+            - statusCode: 202
+            - maxResponseTime: 30000
+
+      - get:
+          url: "/api/v1/events/{{ eventId }}"
+          expect:
+            - statusCode: 200
+            - maxResponseTime: 200
+
+      - put:
+          url: "/api/v1/events/{{ eventId }}/metadata"
+          json:
+            metadata: "{{ metadata }}"
+          expect:
+            - statusCode: 200
+            - maxResponseTime: 500
+
+before:
+  flow:
+    - function: "initializeMetrics"
+    - log: "Starting load test with monitoring enabled"
+
+after:
+  flow:
+    - function: "exportMetrics"
+    - log: "Load test completed, metrics exported"
+
+variables:
+  memberServiceThresholds:
+    p95: 500
+    errorRate: 0.01
+  analyticsServiceThresholds:
+    p95: 5000
+    errorRate: 0.005
+  eventServiceThresholds:
+    p95: 30000
+    errorRate: 0.01
