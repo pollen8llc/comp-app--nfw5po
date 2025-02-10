@@ -1,0 +1,182 @@
+{
+  "mockMembers": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "profile": {
+        "name": "John Smith",
+        "email": "john.smith@example.com",
+        "location": "San Francisco, CA",
+        "bio": "Tech entrepreneur and community builder"
+      },
+      "socialProfiles": [
+        {
+          "platform": "LINKEDIN",
+          "externalId": "john-smith-sf123",
+          "authData": {
+            "accessToken": "mock-linkedin-token",
+            "refreshToken": "mock-linkedin-refresh"
+          },
+          "verified": true
+        },
+        {
+          "platform": "GMAIL",
+          "externalId": "john.smith@gmail.com",
+          "authData": {
+            "accessToken": "mock-gmail-token",
+            "refreshToken": "mock-gmail-refresh"
+          },
+          "verified": true
+        }
+      ],
+      "metadata": [
+        {
+          "key": "entityResolution",
+          "value": "primary",
+          "confidence": 0.98
+        },
+        {
+          "key": "industryTag",
+          "value": "technology",
+          "confidence": 0.95
+        }
+      ],
+      "dataClassification": "PUBLIC",
+      "createdAt": "2023-01-01T00:00:00Z",
+      "updatedAt": "2023-06-15T12:30:00Z"
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440001",
+      "profile": {
+        "name": "Jonathan Smith",
+        "email": "jonathan.smith@example.com",
+        "location": "San Francisco, CA",
+        "bio": "Software Engineer"
+      },
+      "socialProfiles": [
+        {
+          "platform": "LINKEDIN",
+          "externalId": "jonathan-smith-swe",
+          "authData": {
+            "accessToken": "mock-linkedin-token-2",
+            "refreshToken": "mock-linkedin-refresh-2"
+          },
+          "verified": true
+        }
+      ],
+      "metadata": [
+        {
+          "key": "entityResolution",
+          "value": "potentialDuplicate",
+          "confidence": 0.85
+        },
+        {
+          "key": "skillTag",
+          "value": "engineering",
+          "confidence": 0.92
+        }
+      ],
+      "dataClassification": "INTERNAL",
+      "createdAt": "2023-02-15T00:00:00Z",
+      "updatedAt": "2023-06-20T15:45:00Z"
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440002",
+      "profile": {
+        "name": "Alice Johnson",
+        "email": "alice.johnson@example.com",
+        "location": "New York, NY",
+        "bio": "Community Manager"
+      },
+      "socialProfiles": [
+        {
+          "platform": "LINKEDIN",
+          "externalId": "alice-johnson-cm",
+          "authData": {
+            "accessToken": "mock-linkedin-token-3",
+            "refreshToken": "mock-linkedin-refresh-3"
+          },
+          "verified": true
+        },
+        {
+          "platform": "GMAIL",
+          "externalId": "alice.j@gmail.com",
+          "authData": {
+            "accessToken": "mock-gmail-token-3",
+            "refreshToken": "mock-gmail-refresh-3"
+          },
+          "verified": false
+        }
+      ],
+      "metadata": [
+        {
+          "key": "entityResolution",
+          "value": "primary",
+          "confidence": 0.99
+        },
+        {
+          "key": "roleTag",
+          "value": "community",
+          "confidence": 0.97
+        }
+      ],
+      "dataClassification": "CONFIDENTIAL",
+      "createdAt": "2023-03-01T00:00:00Z",
+      "updatedAt": "2023-06-25T09:15:00Z"
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440003",
+      "profile": {
+        "name": "Admin User",
+        "email": "admin@example.com",
+        "location": "Remote",
+        "bio": "System Administrator"
+      },
+      "socialProfiles": [
+        {
+          "platform": "GMAIL",
+          "externalId": "admin@gmail.com",
+          "authData": {
+            "accessToken": "mock-gmail-token-4",
+            "refreshToken": "mock-gmail-refresh-4"
+          },
+          "verified": true
+        }
+      ],
+      "metadata": [
+        {
+          "key": "entityResolution",
+          "value": "primary",
+          "confidence": 1.0
+        },
+        {
+          "key": "accessLevel",
+          "value": "administrator",
+          "confidence": 1.0
+        }
+      ],
+      "dataClassification": "RESTRICTED",
+      "createdAt": "2023-01-15T00:00:00Z",
+      "updatedAt": "2023-06-30T18:00:00Z"
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440004",
+      "profile": {
+        "name": "Test User",
+        "email": "test@example.com",
+        "location": null,
+        "bio": null
+      },
+      "socialProfiles": [],
+      "metadata": [
+        {
+          "key": "entityResolution",
+          "value": "unverified",
+          "confidence": 0.5
+        }
+      ],
+      "dataClassification": "INTERNAL",
+      "createdAt": "2023-06-01T00:00:00Z",
+      "updatedAt": "2023-06-01T00:00:00Z"
+    }
+  ]
+}
