@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: analytics-service
+  namespace: community-platform
+  labels:
+    app: analytics-service
+    component: analytics
+    part-of: community-platform
+    tier: backend
+    managed-by: kubernetes
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "5000"
+    prometheus.io/path: "/metrics"
+    service.kubernetes.io/topology-aware-hints: "auto"
+    service.beta.kubernetes.io/target-service-version: "v1"
+spec:
+  type: ClusterIP
+  ports:
+    - name: grpc
+      port: 5000
+      targetPort: 5000
+      protocol: TCP
+      appProtocol: grpc
+    - name: metrics
+      port: 5000
+      targetPort: 5000
+      protocol: TCP
+      appProtocol: http
+  selector:
+    app: analytics-service
+    component: analytics
+  sessionAffinity: None
+  publishNotReadyAddresses: false
+  internalTrafficPolicy: Cluster
