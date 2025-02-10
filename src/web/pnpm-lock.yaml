@@ -1,0 +1,410 @@
+lockfileVersion: 5.4
+packageManager: pnpm@8.0.0
+nodeVersion: '>=18.0.0'
+
+dependencies:
+  '@accessibility/react-hooks':
+    version: 1.0.0
+    resolution: registry.npmjs.org/@accessibility/react-hooks/1.0.0
+    integrity: sha512-[hash]
+
+  '@auth/admin':
+    version: 1.0.0
+    resolution: registry.npmjs.org/@auth/admin/1.0.0
+    integrity: sha512-[hash]
+
+  '@clerk/clerk-js':
+    version: 4.0.0
+    resolution: registry.npmjs.org/@clerk/clerk-js/4.0.0
+    integrity: sha512-[hash]
+
+  '@clerk/nextjs':
+    version: 4.0.0
+    resolution: registry.npmjs.org/@clerk/nextjs/4.0.0
+    integrity: sha512-[hash]
+
+  '@clerk/security':
+    version: 4.0.0
+    resolution: registry.npmjs.org/@clerk/security/4.0.0
+    integrity: sha512-[hash]
+
+  '@company/audit-logger':
+    version: 1.0.0
+    resolution: registry.npmjs.org/@company/audit-logger/1.0.0
+    integrity: sha512-[hash]
+
+  '@graph-gl/react':
+    version: 1.0.0
+    resolution: registry.npmjs.org/@graph-gl/react/1.0.0
+    integrity: sha512-[hash]
+
+  '@graph-gl/types':
+    version: 1.0.0
+    resolution: registry.npmjs.org/@graph-gl/types/1.0.0
+    integrity: sha512-[hash]
+
+  '@graph-gl/virtualization':
+    version: 1.0.0
+    resolution: registry.npmjs.org/@graph-gl/virtualization/1.0.0
+    integrity: sha512-[hash]
+
+  '@hookform/resolvers':
+    version: 3.22.0
+    resolution: registry.npmjs.org/@hookform/resolvers/3.22.0
+    integrity: sha512-[hash]
+
+  '@mui/material':
+    version: 5.0.0
+    resolution: registry.npmjs.org/@mui/material/5.0.0
+    integrity: sha512-[hash]
+
+  '@newrelic/browser-agent':
+    version: 1.0.0
+    resolution: registry.npmjs.org/@newrelic/browser-agent/1.0.0
+    integrity: sha512-[hash]
+
+  '@react-aria/interactions':
+    version: 3.0.0
+    resolution: registry.npmjs.org/@react-aria/interactions/3.0.0
+    integrity: sha512-[hash]
+
+  '@react-hook/media-query':
+    version: 1.1.1
+    resolution: registry.npmjs.org/@react-hook/media-query/1.1.1
+    integrity: sha512-[hash]
+
+  '@sentry/react':
+    version: 7.0.0
+    resolution: registry.npmjs.org/@sentry/react/7.0.0
+    integrity: sha512-[hash]
+
+  '@tanstack/react-query':
+    version: 4.0.0
+    resolution: registry.npmjs.org/@tanstack/react-query/4.0.0
+    integrity: sha512-[hash]
+
+  '@tanstack/react-virtual':
+    version: 3.0.0
+    resolution: registry.npmjs.org/@tanstack/react-virtual/3.0.0
+    integrity: sha512-[hash]
+
+  axios:
+    version: 1.4.0
+    resolution: registry.npmjs.org/axios/1.4.0
+    integrity: sha512-[hash]
+
+  circuit-breaker-js:
+    version: 0.0.1
+    resolution: registry.npmjs.org/circuit-breaker-js/0.0.1
+    integrity: sha512-[hash]
+
+  classnames:
+    version: 2.3.2
+    resolution: registry.npmjs.org/classnames/2.3.2
+    integrity: sha512-[hash]
+
+  clsx:
+    version: 2.0.0
+    resolution: registry.npmjs.org/clsx/2.0.0
+    integrity: sha512-[hash]
+
+  crypto-js:
+    version: 4.1.1
+    resolution: registry.npmjs.org/crypto-js/4.1.1
+    integrity: sha512-[hash]
+
+  d3:
+    version: 7.0.0
+    resolution: registry.npmjs.org/d3/7.0.0
+    integrity: sha512-[hash]
+
+  d3-drag:
+    version: 3.0.0
+    resolution: registry.npmjs.org/d3-drag/3.0.0
+    integrity: sha512-[hash]
+
+  d3-force:
+    version: 3.0.0
+    resolution: registry.npmjs.org/d3-force/3.0.0
+    integrity: sha512-[hash]
+
+  d3-selection:
+    version: 3.0.0
+    resolution: registry.npmjs.org/d3-selection/3.0.0
+    integrity: sha512-[hash]
+
+  d3-zoom:
+    version: 3.0.0
+    resolution: registry.npmjs.org/d3-zoom/3.0.0
+    integrity: sha512-[hash]
+
+  date-fns:
+    version: 2.30.0
+    resolution: registry.npmjs.org/date-fns/2.30.0
+    integrity: sha512-[hash]
+
+  formik:
+    version: 2.4.0
+    resolution: registry.npmjs.org/formik/2.4.0
+    integrity: sha512-[hash]
+
+  framer-motion:
+    version: 10.0.0
+    resolution: registry.npmjs.org/framer-motion/10.0.0
+    integrity: sha512-[hash]
+
+  lodash:
+    version: 4.17.21
+    resolution: registry.npmjs.org/lodash/4.17.21
+    integrity: sha512-[hash]
+
+  next:
+    version: 13.0.0
+    resolution: registry.npmjs.org/next/13.0.0
+    integrity: sha512-[hash]
+
+  next-i18next:
+    version: 13.0.0
+    resolution: registry.npmjs.org/next-i18next/13.0.0
+    integrity: sha512-[hash]
+
+  newrelic:
+    version: 9.0.0
+    resolution: registry.npmjs.org/newrelic/9.0.0
+    integrity: sha512-[hash]
+
+  newrelic-browser:
+    version: 1.0.0
+    resolution: registry.npmjs.org/newrelic-browser/1.0.0
+    integrity: sha512-[hash]
+
+  numeral:
+    version: 2.0.6
+    resolution: registry.npmjs.org/numeral/2.0.6
+    integrity: sha512-[hash]
+
+  react:
+    version: 18.0.0
+    resolution: registry.npmjs.org/react/18.0.0
+    integrity: sha512-[hash]
+
+  react-dom:
+    version: 18.2.0
+    resolution: registry.npmjs.org/react-dom/18.2.0
+    integrity: sha512-[hash]
+
+  react-error-boundary:
+    version: 4.0.0
+    resolution: registry.npmjs.org/react-error-boundary/4.0.0
+    integrity: sha512-[hash]
+
+  react-hook-form:
+    version: 7.45.0
+    resolution: registry.npmjs.org/react-hook-form/7.45.0
+    integrity: sha512-[hash]
+
+  react-hot-toast:
+    version: 2.0.0
+    resolution: registry.npmjs.org/react-hot-toast/2.0.0
+    integrity: sha512-[hash]
+
+  tailwind-merge:
+    version: 3.0.0
+    resolution: registry.npmjs.org/tailwind-merge/3.0.0
+    integrity: sha512-[hash]
+
+  tailwindcss:
+    version: 3.0.0
+    resolution: registry.npmjs.org/tailwindcss/3.0.0
+    integrity: sha512-[hash]
+
+  use-debounce:
+    version: 9.0.0
+    resolution: registry.npmjs.org/use-debounce/9.0.0
+    integrity: sha512-[hash]
+
+  webgl-utils:
+    version: 2.0.0
+    resolution: registry.npmjs.org/webgl-utils/2.0.0
+    integrity: sha512-[hash]
+
+  yup:
+    version: 1.0.0
+    resolution: registry.npmjs.org/yup/1.0.0
+    integrity: sha512-[hash]
+
+  zod:
+    version: 3.22.0
+    resolution: registry.npmjs.org/zod/3.22.0
+    integrity: sha512-[hash]
+
+devDependencies:
+  '@next/bundle-analyzer':
+    version: 13.0.0
+    resolution: registry.npmjs.org/@next/bundle-analyzer/13.0.0
+    integrity: sha512-[hash]
+
+  '@tailwindcss/forms':
+    version: 0.5.0
+    resolution: registry.npmjs.org/@tailwindcss/forms/0.5.0
+    integrity: sha512-[hash]
+
+  '@tailwindcss/typography':
+    version: 0.5.0
+    resolution: registry.npmjs.org/@tailwindcss/typography/0.5.0
+    integrity: sha512-[hash]
+
+  '@testing-library/jest-dom':
+    version: 5.16.5
+    resolution: registry.npmjs.org/@testing-library/jest-dom/5.16.5
+    integrity: sha512-[hash]
+
+  '@testing-library/react':
+    version: 14.0.0
+    resolution: registry.npmjs.org/@testing-library/react/14.0.0
+    integrity: sha512-[hash]
+
+  '@types/d3':
+    version: 7.0.0
+    resolution: registry.npmjs.org/@types/d3/7.0.0
+    integrity: sha512-[hash]
+
+  '@types/next':
+    version: 13.0.0
+    resolution: registry.npmjs.org/@types/next/13.0.0
+    integrity: sha512-[hash]
+
+  '@types/node':
+    version: 18.0.0
+    resolution: registry.npmjs.org/@types/node/18.0.0
+    integrity: sha512-[hash]
+
+  '@types/react':
+    version: 18.0.0
+    resolution: registry.npmjs.org/@types/react/18.0.0
+    integrity: sha512-[hash]
+
+  '@typescript-eslint/eslint-plugin':
+    version: 5.59.0
+    resolution: registry.npmjs.org/@typescript-eslint/eslint-plugin/5.59.0
+    integrity: sha512-[hash]
+
+  '@typescript-eslint/parser':
+    version: 5.59.0
+    resolution: registry.npmjs.org/@typescript-eslint/parser/5.59.0
+    integrity: sha512-[hash]
+
+  autoprefixer:
+    version: 10.0.0
+    resolution: registry.npmjs.org/autoprefixer/10.0.0
+    integrity: sha512-[hash]
+
+  cypress:
+    version: 12.0.0
+    resolution: registry.npmjs.org/cypress/12.0.0
+    integrity: sha512-[hash]
+
+  eslint:
+    version: 8.0.0
+    resolution: registry.npmjs.org/eslint/8.0.0
+    integrity: sha512-[hash]
+
+  eslint-config-next:
+    version: 13.4.0
+    resolution: registry.npmjs.org/eslint-config-next/13.4.0
+    integrity: sha512-[hash]
+
+  eslint-config-prettier:
+    version: 8.8.0
+    resolution: registry.npmjs.org/eslint-config-prettier/8.8.0
+    integrity: sha512-[hash]
+
+  eslint-plugin-jsx-a11y:
+    version: 6.7.1
+    resolution: registry.npmjs.org/eslint-plugin-jsx-a11y/6.7.1
+    integrity: sha512-[hash]
+
+  eslint-plugin-react:
+    version: 7.33.0
+    resolution: registry.npmjs.org/eslint-plugin-react/7.33.0
+    integrity: sha512-[hash]
+
+  eslint-plugin-react-hooks:
+    version: 4.6.0
+    resolution: registry.npmjs.org/eslint-plugin-react-hooks/4.6.0
+    integrity: sha512-[hash]
+
+  eslint-plugin-security:
+    version: 1.7.1
+    resolution: registry.npmjs.org/eslint-plugin-security/1.7.1
+    integrity: sha512-[hash]
+
+  jest:
+    version: 29.0.0
+    resolution: registry.npmjs.org/jest/29.0.0
+    integrity: sha512-[hash]
+
+  jest-environment-jsdom:
+    version: 29.0.0
+    resolution: registry.npmjs.org/jest-environment-jsdom/29.0.0
+    integrity: sha512-[hash]
+
+  next-transpile-modules:
+    version: 10.0.0
+    resolution: registry.npmjs.org/next-transpile-modules/10.0.0
+    integrity: sha512-[hash]
+
+  postcss:
+    version: 8.0.0
+    resolution: registry.npmjs.org/postcss/8.0.0
+    integrity: sha512-[hash]
+
+  postcss-import:
+    version: 15.0.0
+    resolution: registry.npmjs.org/postcss-import/15.0.0
+    integrity: sha512-[hash]
+
+  postcss-nesting:
+    version: 11.0.0
+    resolution: registry.npmjs.org/postcss-nesting/11.0.0
+    integrity: sha512-[hash]
+
+  postcss-preset-env:
+    version: 8.0.0
+    resolution: registry.npmjs.org/postcss-preset-env/8.0.0
+    integrity: sha512-[hash]
+
+  prettier:
+    version: 3.0.0
+    resolution: registry.npmjs.org/prettier/3.0.0
+    integrity: sha512-[hash]
+
+  typescript:
+    version: 5.0.4
+    resolution: registry.npmjs.org/typescript/5.0.4
+    integrity: sha512-[hash]
+
+packages:
+  /registry.npmjs.org/@accessibility/react-hooks/1.0.0:
+    name: '@accessibility/react-hooks'
+    version: 1.0.0
+    engines: {node: '>=18.0.0'}
+    dependencies:
+      react: ^18.0.0
+      react-dom: ^18.0.0
+    dev: false
+
+  /registry.npmjs.org/@auth/admin/1.0.0:
+    name: '@auth/admin'
+    version: 1.0.0
+    engines: {node: '>=18.0.0'}
+    dependencies:
+      '@clerk/clerk-js': ^4.0.0
+    dev: false
+
+# Additional package entries following same pattern...
+
+resolutions:
+  '@types/react': 18.0.0
+  '@types/react-dom': 18.0.0
+  typescript: 5.0.4
