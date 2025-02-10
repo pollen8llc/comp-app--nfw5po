@@ -1,0 +1,135 @@
+syntax = "proto3";
+
+package community.member.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// Core message definition for member data including profile, social connections, 
+// and metadata with proper PII protection
+message Member {
+  // Unique identifier for the member
+  string id = 1;
+
+  // Email address (PII - encrypted at rest)
+  string email = 2;
+
+  // Detailed profile information
+  Profile profile = 3;
+
+  // Collection of linked social profiles
+  repeated SocialProfile social_profiles = 4;
+
+  // Additional metadata key-value pairs
+  map<string, string> metadata = 5;
+
+  // Timestamp of member creation
+  google.protobuf.Timestamp created_at = 6;
+
+  // Timestamp of last member update
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+// Detailed member profile information with optional fields for flexibility
+message Profile {
+  // First name (PII - encrypted at rest)
+  string first_name = 1;
+
+  // Last name (PII - encrypted at rest)
+  string last_name = 2;
+
+  // Optional location information
+  optional string location = 3;
+
+  // Optional biography or description
+  optional string bio = 4;
+}
+
+// Social platform profile information with secure auth data handling
+message SocialProfile {
+  // Type of social platform
+  SocialPlatform platform = 1;
+
+  // External identifier from the social platform
+  string external_id = 2;
+
+  // Encrypted authentication data
+  map<string, string> auth_data = 3;
+}
+
+// Enumeration of supported social platforms for integration
+enum SocialPlatform {
+  // Default unspecified value
+  SOCIAL_PLATFORM_UNSPECIFIED = 0;
+
+  // LinkedIn platform integration
+  SOCIAL_PLATFORM_LINKEDIN = 1;
+
+  // Gmail platform integration
+  SOCIAL_PLATFORM_GMAIL = 2;
+}
+
+// Request message for creating a new member with required profile information
+message CreateMemberRequest {
+  // Email address for the new member
+  string email = 1;
+
+  // Initial profile information
+  Profile profile = 2;
+
+  // Optional social profiles to link
+  repeated SocialProfile social_profiles = 3;
+}
+
+// Response message containing the created member details
+message CreateMemberResponse {
+  // Created member information
+  Member member = 1;
+}
+
+// Request message for updating existing member information
+message UpdateMemberRequest {
+  // Member identifier to update
+  string id = 1;
+
+  // Updated profile information
+  Profile profile = 2;
+
+  // Updated social profiles
+  repeated SocialProfile social_profiles = 3;
+}
+
+// Response message containing the updated member details
+message UpdateMemberResponse {
+  // Updated member information
+  Member member = 1;
+}
+
+// Request message for member entity resolution with social profile matching
+message ResolveMemberEntityRequest {
+  // Email address to resolve
+  string email = 1;
+
+  // Social profiles for matching
+  repeated SocialProfile social_profiles = 2;
+}
+
+// Response message with resolved member and confidence score
+message ResolveMemberEntityResponse {
+  // Resolved member information if found
+  Member member = 1;
+
+  // Confidence score of the resolution (0.0 to 1.0)
+  float confidence_score = 2;
+}
+
+// gRPC service definition for member management operations
+service MemberService {
+  // Creates a new member with the provided information
+  rpc CreateMember(CreateMemberRequest) returns (CreateMemberResponse) {}
+
+  // Updates an existing member's information
+  rpc UpdateMember(UpdateMemberRequest) returns (UpdateMemberResponse) {}
+
+  // Resolves member identity through entity resolution
+  rpc ResolveMemberEntity(ResolveMemberEntityRequest) returns (ResolveMemberEntityResponse) {}
+}
