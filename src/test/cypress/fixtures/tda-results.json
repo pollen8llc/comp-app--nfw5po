@@ -1,0 +1,129 @@
+{
+  "persistence_diagram": {
+    "dimension": 2,
+    "points": [
+      [0.1, 0.3],
+      [0.2, 0.5],
+      [0.3, 0.7],
+      [0.4, 0.8],
+      [0.5, 0.9]
+    ],
+    "feature_types": [
+      "connected_component",
+      "cycle",
+      "void"
+    ],
+    "validation_ranges": {
+      "birth": [0.0, 1.0],
+      "death": [0.0, 1.0],
+      "persistence": [0.0, 1.0]
+    }
+  },
+  "topological_features": [
+    {
+      "type": "connected_component",
+      "birth": 0.1,
+      "death": 0.3,
+      "persistence": 0.2,
+      "significance": 0.67,
+      "coordinates": {
+        "x": 120,
+        "y": 180
+      },
+      "metadata": {
+        "size": 15,
+        "members": ["node1", "node2", "node3"]
+      }
+    },
+    {
+      "type": "cycle",
+      "birth": 0.2,
+      "death": 0.5,
+      "persistence": 0.3,
+      "significance": 0.85,
+      "coordinates": {
+        "x": 250,
+        "y": 320
+      },
+      "metadata": {
+        "size": 8,
+        "members": ["node4", "node5", "node6"]
+      }
+    }
+  ],
+  "computation_parameters": {
+    "epsilon": 0.5,
+    "min_points": 15,
+    "dimension": 2,
+    "persistence_threshold": 0.3,
+    "distance_metric": "euclidean",
+    "validation_bounds": {
+      "epsilon": [0.1, 1.0],
+      "min_points": [5, 50],
+      "dimension": [1, 3],
+      "persistence_threshold": [0.1, 0.9]
+    }
+  },
+  "visualization_params": {
+    "dimensions": {
+      "width": 600,
+      "height": 400,
+      "margin": {
+        "top": 20,
+        "right": 20,
+        "bottom": 30,
+        "left": 40
+      },
+      "responsive": true
+    },
+    "appearance": {
+      "show_diagonal": true,
+      "show_tooltips": true,
+      "theme": {
+        "light": {
+          "background": "#ffffff",
+          "points": "#2196f3",
+          "diagonal": "#cccccc",
+          "text": "#000000"
+        },
+        "dark": {
+          "background": "#1a1a1a",
+          "points": "#64b5f6",
+          "diagonal": "#404040",
+          "text": "#ffffff"
+        }
+      }
+    },
+    "accessibility": {
+      "aria_labels": true,
+      "keyboard_navigation": true,
+      "color_contrast_ratio": 4.5
+    },
+    "internationalization": {
+      "number_format": "en-US",
+      "date_format": "ISO"
+    }
+  },
+  "test_scenarios": {
+    "empty_diagram": {
+      "points": [],
+      "features": []
+    },
+    "single_point": {
+      "points": [[0.3, 0.6]],
+      "features": [
+        {
+          "type": "connected_component",
+          "birth": 0.3,
+          "death": 0.6,
+          "persistence": 0.3
+        }
+      ]
+    },
+    "large_dataset": {
+      "points_count": 1000,
+      "features_count": 50,
+      "performance_threshold_ms": 500
+    }
+  }
+}
