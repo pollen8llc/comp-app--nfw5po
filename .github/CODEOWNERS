@@ -1,0 +1,44 @@
+# Unless a later match takes precedence
+* @platform-admins
+
+# Analytics service ownership
+/src/backend/analytics-service/ @analytics-team
+
+# API Gateway ownership
+/src/backend/api-gateway/ @api-team
+
+# Event service ownership
+/src/backend/event-service/ @events-team
+
+# Member service ownership
+/src/backend/member-service/ @member-team
+
+# Frontend ownership
+/src/web/ @frontend-team
+
+# Infrastructure ownership
+/infrastructure/ @devops-team
+
+# Testing ownership
+/src/test/ @qa-team
+
+# Protocol buffer definitions
+*.proto @api-team
+
+# Schema definitions
+*.schema.ts @api-team
+
+# Type definitions
+*.types.ts @api-team
+
+# Database migrations and scripts
+/src/backend/db/ @db-team
+
+# Infrastructure as Code
+*.tf @devops-team
+
+# CI/CD and configuration files
+*.yml @devops-team
+
+# Kubernetes and OpenAPI specs
+*.yaml @devops-team
