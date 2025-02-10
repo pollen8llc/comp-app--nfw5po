@@ -1,0 +1,69 @@
+<svg 
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  width="24"
+  height="24"
+  role="progressbar"
+  aria-label="Loading content"
+  aria-busy="true"
+  aria-live="polite"
+  aria-atomic="true"
+  preserveAspectRatio="xMidYMid meet"
+>
+  <style>
+    .loading-spinner {
+      transform-origin: center;
+      animation: loading-spinner-rotate 1.5s ease-in-out infinite;
+    }
+
+    .spinner-track {
+      opacity: 0.3;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .loading-spinner {
+        animation: loading-spinner-opacity 1.5s ease-in-out infinite;
+      }
+    }
+
+    @keyframes loading-spinner-rotate {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes loading-spinner-opacity {
+      0%, 100% {
+        opacity: 0.3;
+      }
+      50% {
+        opacity: 1;
+      }
+    }
+  </style>
+
+  <!-- Track Circle -->
+  <circle 
+    class="spinner-track"
+    cx="12"
+    cy="12"
+    r="10"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+  />
+
+  <!-- Spinner Arc -->
+  <path
+    class="loading-spinner"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    d="M12 2A10 10 0 0 1 22 12"
+    style="will-change: transform"
+  />
+</svg>
