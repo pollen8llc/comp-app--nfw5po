@@ -1,0 +1,150 @@
+# Prometheus Alert Rules Configuration v2.45.0
+# Defines critical alerts and thresholds for the Community Management Platform
+
+groups:
+  # API Performance and Reliability Alerts
+  - name: api_alerts
+    rules:
+      - alert: HighErrorRate
+        expr: sum(rate(http_requests_total{status=~"5.."}[5m])) by (service) / sum(rate(http_requests_total[5m])) by (service) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: High API error rate detected
+          description: Service {{ $labels.service }} has error rate above 5% for 5 minutes
+          runbook_url: https://wiki.internal/runbooks/high-error-rate
+
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, service)) > 2
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: High API latency detected
+          description: Service {{ $labels.service }} has P95 latency above 2s for 5 minutes
+          runbook_url: https://wiki.internal/runbooks/high-latency
+
+  # Graph Database Performance Alerts  
+  - name: graph_alerts
+    rules:
+      - alert: GraphQueryLatency
+        expr: histogram_quantile(0.95, sum(rate(graph_query_duration_seconds_bucket[5m])) by (le, query_type)) > 5
+        for: 5m
+        labels:
+          severity: warning
+          team: data
+        annotations:
+          summary: High graph query latency
+          description: Graph queries of type {{ $labels.query_type }} have P95 latency above 5s
+          runbook_url: https://wiki.internal/runbooks/graph-latency
+
+      - alert: GraphErrorRate
+        expr: sum(rate(neo4j_query_errors_total[5m])) by (query_type) / sum(rate(neo4j_queries_total[5m])) by (query_type) > 0.01
+        for: 5m
+        labels:
+          severity: warning
+          team: data
+        annotations:
+          summary: High graph query error rate
+          description: Query type {{ $labels.query_type }} has error rate above 1%
+          runbook_url: https://wiki.internal/runbooks/graph-errors
+
+  # System Resource Alerts
+  - name: system_alerts
+    rules:
+      - alert: HighMemoryUsage
+        expr: container_memory_usage_bytes / container_spec_memory_limit_bytes * 100 > 85
+        for: 10m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: High memory usage detected
+          description: Container {{ $labels.container_name }} using >85% memory for 10 minutes
+          runbook_url: https://wiki.internal/runbooks/high-memory
+
+      - alert: HighCPUUsage
+        expr: sum(rate(container_cpu_usage_seconds_total[5m])) by (container_name) * 100 > 80
+        for: 10m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: High CPU usage detected
+          description: Container {{ $labels.container_name }} using >80% CPU for 10 minutes
+          runbook_url: https://wiki.internal/runbooks/high-cpu
+
+      - alert: DiskSpaceRunningOut
+        expr: (node_filesystem_size_bytes - node_filesystem_free_bytes) / node_filesystem_size_bytes * 100 > 85
+        for: 30m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: Disk space running low
+          description: Disk usage on {{ $labels.device }} is above 85%
+          runbook_url: https://wiki.internal/runbooks/disk-space
+
+  # Security Alerts
+  - name: security_alerts
+    rules:
+      - alert: HighAuthFailures
+        expr: sum(rate(auth_failures_total[5m])) by (service) * 60 > 10
+        for: 5m
+        labels:
+          severity: critical
+          team: security
+        annotations:
+          summary: High authentication failure rate
+          description: Service {{ $labels.service }} experiencing >10 auth failures/min for 5 minutes
+          runbook_url: https://wiki.internal/runbooks/auth-failures
+
+      - alert: RateLimitExceeded
+        expr: sum(rate(rate_limit_exceeded_total[5m])) by (endpoint) * 60 > 100
+        for: 5m
+        labels:
+          severity: warning
+          team: security
+        annotations:
+          summary: Rate limit exceeded frequently
+          description: Endpoint {{ $labels.endpoint }} exceeding rate limits >100 times/min
+          runbook_url: https://wiki.internal/runbooks/rate-limits
+
+      - alert: SuspiciousAccessPattern
+        expr: sum(rate(suspicious_access_total[5m])) by (pattern_type) * 60 > 5
+        for: 5m
+        labels:
+          severity: critical
+          team: security
+        annotations:
+          summary: Suspicious access pattern detected
+          description: Pattern type {{ $labels.pattern_type }} detected >5 times/min
+          runbook_url: https://wiki.internal/runbooks/suspicious-access
+
+  # Analytics Service Alerts
+  - name: analytics_alerts
+    rules:
+      - alert: TDAComputationDelay
+        expr: rate(tda_computation_duration_seconds_sum[5m]) / rate(tda_computation_duration_seconds_count[5m]) > 10
+        for: 15m
+        labels:
+          severity: warning
+          team: data
+        annotations:
+          summary: TDA computation taking too long
+          description: Average TDA computation time exceeding 10s threshold
+          runbook_url: https://wiki.internal/runbooks/tda-performance
+
+      - alert: LowEntityResolutionAccuracy
+        expr: sum(rate(entity_resolution_success_total[5m])) / sum(rate(entity_resolution_total[5m])) < 0.95
+        for: 15m
+        labels:
+          severity: warning
+          team: data
+        annotations:
+          summary: Low entity resolution accuracy
+          description: Entity resolution accuracy below 95% threshold
+          runbook_url: https://wiki.internal/runbooks/entity-resolution
