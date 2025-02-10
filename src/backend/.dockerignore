@@ -1,0 +1,156 @@
+# Dependency directories and caches
+node_modules
+**/__pycache__
+*.pyc
+.pnpm-store
+poetry.lock
+pnpm-lock.yaml
+.pip-cache
+venv
+**/*.egg-info
+.npm
+.pnpm
+.yarn
+.cargo
+
+# Build artifacts
+dist
+build
+*.tsbuildinfo
+coverage
+.coverage
+coverage.xml
+*.pyo
+*.pyd
+**/.pytest_cache
+.next
+.nuxt
+.output
+.cache
+
+# Test files
+test
+tests
+**/*.test.ts
+**/*.spec.ts
+**/*_test.py
+**/*_spec.py
+cypress
+jest.config.js
+pytest.ini
+.mocha
+.nyc_output
+
+# Development configs
+.env*
+.vscode
+.idea
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+.eslintrc*
+.pylintrc
+tsconfig.json
+nodemon.json
+.editorconfig
+.prettierrc*
+.babelrc*
+
+# Version control
+.git
+.gitignore
+.gitattributes
+.github
+.gitlab
+.hg
+.svn
+
+# Documentation
+README.md
+CHANGELOG.md
+docs
+api-docs
+*.md
+LICENSE
+AUTHORS
+CONTRIBUTORS
+
+# Service-specific
+**/*.ipynb
+**/*.ipynb_checkpoints
+**/event-samples
+**/profile-samples
+**/swagger.json
+**/openapi.json
+**/*.proto
+**/protos
+**/grpc
+
+# Monitoring and debugging
+**/logs
+**/*.log
+**/newrelic.js
+**/prometheus.yml
+**/*.heapsnapshot
+**/profiling
+.clinic
+
+# Temporary files
+tmp
+temp
+.tmp
+**/*.bak
+**/*~
+**/#*#
+**/.#*
+
+# Docker
+.docker
+docker-compose*.yml
+Dockerfile*
+
+# CI/CD
+.circleci
+.travis.yml
+.gitlab-ci.yml
+.github/workflows
+.jenkins
+.drone.yml
+
+# Security and keys
+**/*.pem
+**/*.key
+**/*.cert
+**/*.crt
+**/*.p12
+**/*.pfx
+.gnupg
+.ssh
+
+# Package manager files
+package-lock.json
+yarn.lock
+shrinkwrap.json
+composer.lock
+
+# IDE specific
+.vs
+.vscode
+.idea
+*.sublime-*
+*.swp
+*.swo
+.project
+.settings
+.classpath
+.factorypath
+
+# OS specific
+.DS_Store
+Thumbs.db
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
