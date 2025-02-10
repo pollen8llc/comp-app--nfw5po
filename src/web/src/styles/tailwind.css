@@ -1,0 +1,138 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+@import '../styles/globals.css';
+
+/* Base layer with Material Design foundations */
+@layer base {
+  html {
+    @apply antialiased motion-safe:scroll-smooth;
+    font-family: var(--font-sans);
+  }
+
+  body {
+    @apply bg-background text-on-background motion-safe:transition-colors;
+    text-rendering: optimizeLegibility;
+  }
+
+  [data-theme='dark'] {
+    @apply bg-background-dark text-on-background-dark;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      @apply transition-none animation-none;
+    }
+  }
+}
+
+/* Material Design component styles with motion and accessibility */
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-md font-medium transition-all;
+    @apply shadow-md hover:shadow-lg focus:ring-2 focus:ring-primary;
+    @apply min-h-[var(--touch-target-size)] min-w-[var(--touch-target-size)];
+    @apply motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-material;
+  }
+
+  .card {
+    @apply bg-surface rounded-lg shadow-md;
+    @apply motion-safe:hover:shadow-lg motion-safe:transition-shadow;
+    @apply p-4 relative overflow-hidden;
+  }
+
+  .input {
+    @apply w-full p-2 rounded-md border border-outline;
+    @apply focus:border-primary focus:ring-2 focus:ring-primary/50;
+    @apply bg-surface text-on-surface;
+    @apply min-h-[var(--touch-target-size)];
+  }
+
+  .dialog {
+    @apply fixed inset-0 bg-scrim bg-opacity-50;
+    @apply motion-safe:transition-opacity;
+    @apply flex items-center justify-center;
+  }
+}
+
+/* Enhanced utility classes for accessibility and motion */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .scrollbar-hide {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .elevation-1 {
+    box-shadow: var(--elevation-1);
+  }
+
+  .elevation-2 {
+    box-shadow: var(--elevation-2);
+  }
+
+  .elevation-3 {
+    box-shadow: var(--elevation-3);
+  }
+
+  .motion-safe\:transition-all {
+    @apply transition-all duration-200;
+    transition-timing-function: var(--motion-easing);
+  }
+}
+
+/* Responsive breakpoints */
+@screen sm {
+  /* Mobile - 320px */
+  html {
+    font-size: 14px;
+  }
+}
+
+@screen md {
+  /* Tablet - 768px */
+  html {
+    font-size: 16px;
+  }
+}
+
+@screen lg {
+  /* Desktop - 1024px */
+  html {
+    font-size: 16px;
+  }
+}
+
+@screen xl {
+  /* Wide desktop - 1440px */
+  html {
+    font-size: 16px;
+  }
+}
+
+/* Theme configuration */
+:root {
+  --background: var(--surface-50);
+  --background-dark: var(--surface-900);
+  --on-background: var(--on-surface-50);
+  --on-background-dark: var(--on-surface-900);
+  --surface: var(--surface-100);
+  --on-surface: var(--on-surface-50);
+  --primary: var(--primary-500);
+  --on-primary: var(--surface-50);
+  --outline: var(--surface-900);
+  --scrim: var(--surface-900);
+}
+
+/* Material Design motion tokens */
+:root {
+  --ease-material: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-material: 200ms;
+}
