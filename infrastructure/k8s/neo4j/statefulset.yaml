@@ -1,0 +1,126 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: neo4j
+  namespace: community-platform
+  labels:
+    app: neo4j
+    component: core
+    tier: database
+    environment: production
+spec:
+  serviceName: neo4j
+  replicas: 1
+  selector:
+    matchLabels:
+      app: neo4j
+  template:
+    metadata:
+      labels:
+        app: neo4j
+        component: core
+        tier: database
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "2004"
+    spec:
+      securityContext:
+        fsGroup: 7474
+        runAsUser: 7474
+        runAsNonRoot: true
+      containers:
+      - name: neo4j
+        image: neo4j-enterprise:5.0
+        ports:
+        - containerPort: 7474
+          name: http
+        - containerPort: 7687
+          name: bolt
+        - containerPort: 7473
+          name: https
+        - containerPort: 6362
+          name: backup
+        - containerPort: 2004
+          name: metrics
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "2"
+          limits:
+            memory: "8Gi"
+            cpu: "4"
+        env:
+        - name: NEO4J_ACCEPT_LICENSE_AGREEMENT
+          value: "yes"
+        - name: NEO4J_AUTH
+          valueFrom:
+            secretKeyRef:
+              name: neo4j-secrets
+              key: auth
+        - name: NEO4J_dbms_ssl_policy_https_enabled
+          value: "true"
+        - name: NEO4J_metrics_enabled
+          value: "true"
+        - name: NEO4J_dbms_backup_enabled
+          value: "true"
+        - name: NEO4J_dbms_memory_heap_initial_size
+          value: "4G"
+        - name: NEO4J_dbms_memory_heap_max_size
+          value: "8G"
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: logs
+          mountPath: /logs
+        - name: config
+          mountPath: /config
+        - name: certificates
+          mountPath: /certificates
+          readOnly: true
+        livenessProbe:
+          tcpSocket:
+            port: 7687
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          tcpSocket:
+            port: 7687
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+        startupProbe:
+          tcpSocket:
+            port: 7687
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          failureThreshold: 30
+      volumes:
+      - name: config
+        configMap:
+          name: neo4j-config
+      - name: certificates
+        secret:
+          secretName: neo4j-certificates
+      terminationGracePeriodSeconds: 300
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Gi
+      storageClassName: gp3
+  - metadata:
+      name: logs
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 20Gi
+      storageClassName: gp3
