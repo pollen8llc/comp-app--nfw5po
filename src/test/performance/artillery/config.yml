@@ -1,0 +1,162 @@
+config:
+  # Base configuration
+  target: "http://localhost:3000"
+  
+  # Environment-specific configurations
+  environments:
+    development:
+      target: "http://localhost:3000"
+      phases:
+        - duration: 60
+          arrivalRate: 2
+          name: "Dev load"
+
+    staging:
+      target: "https://staging-api.community-platform.com"
+      phases:
+        - duration: 300
+          arrivalRate: 5
+          rampTo: 20
+          name: "Staging load"
+
+    production:
+      target: "https://api.community-platform.com"
+      phases:
+        - duration: 300
+          arrivalRate: 5
+          rampTo: 50
+          name: "Warm up"
+        - duration: 600
+          arrivalRate: 50
+          name: "Peak load"
+        - duration: 300
+          arrivalRate: 50
+          rampTo: 5
+          name: "Scale down"
+
+  # Load testing plugins
+  plugins:
+    expect:
+      outputFormat: "prettyError"
+      handleErrors: true
+      errorOnFailure: true
+    metrics-by-endpoint:
+      enableEndpointMetrics: true
+      trackResponseCodes: true
+      trackLatencies: true
+    apm:
+      active: true
+      serviceName: "load-tests"
+      transactionSampleRate: 1.0
+
+  # Performance thresholds based on technical specifications
+  thresholds:
+    # HTTP response time thresholds
+    http.response_time.p95: 2000
+    http.response_time.p99: 5000
+    errors.rate: 1
+
+    # WebSocket response time thresholds
+    ws.response_time.p95: 200
+    ws.response_time.p99: 1000
+
+    # Operation-specific thresholds
+    graphQuery.simple.p95: 200
+    graphQuery.complex.p95: 1000
+    entityResolution.p95: 500
+    tdaComputation.p95: 5000
+    eventImport.p95: 30000
+
+    # WebSocket event thresholds
+    websocket.graph.update.p95: 200
+    websocket.analysis.complete.p95: 500
+    websocket.import.progress.p95: 300
+
+# Import test scenarios
+scenarios:
+  - name: "API Load Tests"
+    weight: 70
+    flow: "{{ apiLoadScenarios }}"
+
+  - name: "WebSocket Tests"
+    weight: 30
+    flow: "{{ websocketScenarios }}"
+
+# Global setup function
+before:
+  flow:
+    - function: "beforeAll"
+      weight: 1
+
+# Global cleanup function
+after:
+  flow:
+    - function: "afterAll"
+      weight: 1
+
+# Global functions
+functions:
+  beforeAll: |
+    module.exports = async function(context, events, done) {
+      // Initialize metrics collection
+      context.vars.startTime = Date.now();
+      context.vars.errors = 0;
+      
+      // Set up APM monitoring
+      context.apm = {
+        active: true,
+        serviceName: 'load-tests',
+        serverUrl: process.env.APM_SERVER_URL
+      };
+
+      // Initialize test data
+      context.vars.testData = {
+        members: [],
+        events: [],
+        queries: []
+      };
+
+      // Set up authentication
+      context.vars.authToken = process.env.TEST_AUTH_TOKEN;
+
+      // Configure WebSocket pools
+      context.vars.wsConnections = new Map();
+
+      // Initialize endpoint metrics
+      context.vars.metrics = {
+        byEndpoint: new Map(),
+        byOperation: new Map()
+      };
+
+      return done();
+    }
+
+  afterAll: |
+    module.exports = async function(context, events, done) {
+      // Calculate test duration
+      const duration = Date.now() - context.vars.startTime;
+      
+      // Generate performance report
+      const report = {
+        duration: duration,
+        totalRequests: context.vars._requestCount,
+        errorRate: context.vars.errors / context.vars._requestCount,
+        metrics: {
+          byEndpoint: Array.from(context.vars.metrics.byEndpoint.entries()),
+          byOperation: Array.from(context.vars.metrics.byOperation.entries())
+        }
+      };
+
+      // Export metrics to monitoring system
+      events.emit('metrics', report);
+
+      // Clean up resources
+      for (const [_, connection] of context.vars.wsConnections) {
+        connection.close();
+      }
+
+      // Archive test results
+      events.emit('done', report);
+
+      return done();
+    }
